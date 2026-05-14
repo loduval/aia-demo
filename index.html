@@ -1,0 +1,3002 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AÏA — L'appui clinique</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FAF7F0;
+  --paper-2:#F3EEE2;
+  --ink:#1A1714;
+  --ink-2:#3D362E;
+  --ink-3:#6B6359;
+  --clinic:#3E5C76;
+  --clinic-2:#5B7A95;
+  --clinic-3:#E8EEF4;
+  --or:#C9A96E;
+  --sage:#5C8374;
+  --sage-2:#E4ECE7;
+  --alert:#C75B5B;
+  --alert-2:#FBEAEA;
+  --warn:#D89B4A;
+  --line:rgba(26,23,20,.12);
+  --line-strong:rgba(26,23,20,.25);
+  --shadow:0 1px 2px rgba(26,23,20,.06), 0 4px 12px rgba(26,23,20,.04);
+  --shadow-2:0 4px 16px rgba(26,23,20,.08), 0 12px 32px rgba(26,23,20,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:'Inter',-apple-system,sans-serif;
+  background:var(--paper);
+  color:var(--ink);
+  font-size:15px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.85' /%3E%3CfeColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.09 0 0 0 0 0.08 0 0 0 0.035 0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity:.6;
+}
+.serif{font-family:'Fraunces',Georgia,serif;font-feature-settings:"ss01";letter-spacing:-.01em}
+.mono{font-family:'JetBrains Mono',monospace}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,textarea,select{font-family:inherit;font-size:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+
+/* Sortie rapide */
+.exit-btn{
+  position:fixed;top:14px;right:14px;z-index:9999;
+  background:var(--alert);color:#fff;font-weight:600;
+  padding:10px 14px;border-radius:8px;font-size:13px;
+  box-shadow:var(--shadow-2);
+  display:flex;align-items:center;gap:8px;
+}
+.exit-btn:hover{background:#a84545}
+.exit-btn .kbd{
+  background:rgba(255,255,255,.25);padding:2px 6px;border-radius:4px;
+  font-family:'JetBrains Mono',monospace;font-size:11px;
+}
+
+/* ====== ACCUEIL ====== */
+.home{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center}
+.home-logo{font-family:'Fraunces',serif;font-size:72px;font-weight:600;letter-spacing:-.04em;line-height:1}
+.home-logo .dot{color:var(--or)}
+.home-tag{font-family:'Fraunces',serif;font-style:italic;color:var(--ink-3);margin-top:8px;font-size:18px}
+.home-sub{max-width:560px;margin:32px auto 48px;color:var(--ink-2);line-height:1.65}
+.home-cards{display:grid;grid-template-columns:1fr;gap:16px;max-width:760px;width:100%}
+@media(min-width:720px){.home-cards{grid-template-columns:1fr 1fr}}
+.home-card{
+  background:#fff;border:1px solid var(--line);border-radius:14px;padding:28px;
+  text-align:left;box-shadow:var(--shadow);transition:transform .15s,box-shadow .15s;
+}
+.home-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-2)}
+.home-card .icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:14px}
+.home-card.prat .icon{background:var(--clinic-3);color:var(--clinic)}
+.home-card.pat .icon{background:var(--sage-2);color:var(--sage)}
+.home-card h2{font-family:'Fraunces',serif;font-size:24px;font-weight:600;margin-bottom:8px}
+.home-card p{color:var(--ink-3);font-size:14px;line-height:1.6;margin-bottom:18px}
+.home-card .go{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:14px}
+.home-card.prat .go{color:var(--clinic)}
+.home-card.pat .go{color:var(--sage)}
+.home-foot{margin-top:48px;font-size:12px;color:var(--ink-3);max-width:520px}
+.home-foot strong{color:var(--ink-2)}
+
+/* ====== LAYOUT PRATICIEN ====== */
+.app{display:flex;min-height:100vh}
+.sidebar{
+  width:280px;border-right:1px solid var(--line);background:#fff;
+  display:flex;flex-direction:column;flex-shrink:0;
+}
+.sidebar-head{padding:18px 20px;border-bottom:1px solid var(--line)}
+.sidebar-head .logo{font-family:'Fraunces',serif;font-size:24px;font-weight:600;letter-spacing:-.02em}
+.sidebar-head .logo .dot{color:var(--or)}
+.sidebar-head .role{font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
+.sidebar-search{padding:12px 16px;border-bottom:1px solid var(--line)}
+.sidebar-search input{
+  width:100%;padding:8px 12px;border:1px solid var(--line);border-radius:8px;
+  background:var(--paper);font-size:13px;outline:none;
+}
+.sidebar-search input:focus{border-color:var(--clinic);background:#fff}
+.sidebar-list{flex:1;overflow-y:auto;padding:8px}
+.sidebar-item{
+  padding:11px 12px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:12px;
+  margin-bottom:2px;transition:background .12s;
+}
+.sidebar-item:hover{background:var(--paper)}
+.sidebar-item.active{background:var(--clinic-3)}
+.sidebar-item .avatar{
+  width:32px;height:32px;border-radius:50%;background:var(--clinic);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;flex-shrink:0;
+}
+.sidebar-item .info{flex:1;min-width:0}
+.sidebar-item .name{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sidebar-item .meta{font-size:11px;color:var(--ink-3)}
+.sidebar-item .badge{
+  width:8px;height:8px;border-radius:50%;background:var(--alert);flex-shrink:0;
+}
+.sidebar-foot{padding:12px;border-top:1px solid var(--line)}
+.btn-add{
+  width:100%;padding:9px;border:1px dashed var(--line-strong);border-radius:8px;
+  color:var(--ink-2);font-size:13px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.btn-add:hover{border-color:var(--clinic);color:var(--clinic);background:var(--clinic-3)}
+
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.main-head{
+  padding:18px 28px;border-bottom:1px solid var(--line);background:#fff;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+}
+.main-head .crumbs{font-size:12px;color:var(--ink-3)}
+.main-head h1{font-family:'Fraunces',serif;font-size:28px;font-weight:600;letter-spacing:-.02em;margin-top:2px}
+.main-head .h-actions{display:flex;gap:8px}
+.btn{
+  padding:9px 14px;border-radius:8px;font-size:13px;font-weight:600;
+  display:inline-flex;align-items:center;gap:6px;transition:all .12s;border:1px solid transparent;
+}
+.btn-primary{background:var(--clinic);color:#fff}
+.btn-primary:hover{background:#34506a}
+.btn-secondary{background:#fff;border-color:var(--line-strong);color:var(--ink-2)}
+.btn-secondary:hover{border-color:var(--clinic);color:var(--clinic)}
+.btn-ghost{color:var(--ink-3)}
+.btn-ghost:hover{background:var(--paper);color:var(--ink-2)}
+.btn-danger{background:var(--alert);color:#fff}
+.btn-danger:hover{background:#a84545}
+.btn-sm{padding:6px 10px;font-size:12px}
+
+.main-tabs{
+  display:flex;gap:0;padding:0 28px;background:#fff;border-bottom:1px solid var(--line);
+  overflow-x:auto;
+}
+.main-tab{
+  padding:12px 16px;font-size:13px;font-weight:500;color:var(--ink-3);
+  border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;
+}
+.main-tab:hover{color:var(--ink-2)}
+.main-tab.active{color:var(--clinic);border-bottom-color:var(--clinic);font-weight:600}
+
+.main-body{flex:1;overflow-y:auto;padding:28px;background:var(--paper)}
+
+/* ====== FICHE PATIENTE — SYNTHÈSE ====== */
+.synth-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:24px}
+.synth-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px;box-shadow:var(--shadow)}
+.synth-card .label{font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.synth-card .value{font-family:'Fraunces',serif;font-size:32px;font-weight:600;line-height:1}
+.synth-card .sub{font-size:12px;color:var(--ink-3);margin-top:6px}
+.synth-card.alert .value{color:var(--alert)}
+.synth-card.warn .value{color:var(--warn)}
+.synth-card.ok .value{color:var(--sage)}
+
+.section{background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:16px;box-shadow:var(--shadow)}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.section-head h3{font-family:'Fraunces',serif;font-size:18px;font-weight:600}
+.section-head .meta{font-size:12px;color:var(--ink-3)}
+
+/* Chart SVG */
+.chart-wrap{padding:12px 0}
+.chart-legend{display:flex;gap:16px;font-size:12px;margin-bottom:10px;flex-wrap:wrap}
+.chart-legend .li{display:flex;align-items:center;gap:6px;color:var(--ink-2)}
+.chart-legend .dot{width:10px;height:10px;border-radius:2px}
+
+/* Pills */
+.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:99px;font-size:12px;font-weight:600;background:var(--paper);color:var(--ink-2)}
+.pill.alert{background:var(--alert-2);color:var(--alert)}
+.pill.warn{background:#FAEFD8;color:#8a6020}
+.pill.ok{background:var(--sage-2);color:var(--sage)}
+.pill.info{background:var(--clinic-3);color:var(--clinic)}
+
+/* Listes */
+.list-item{padding:12px 0;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px}
+.list-item:last-child{border-bottom:none}
+.list-item .li-main{flex:1}
+.list-item .li-title{font-weight:600;font-size:14px}
+.list-item .li-sub{font-size:12px;color:var(--ink-3);margin-top:2px}
+.list-item .li-score{font-family:'Fraunces',serif;font-size:24px;font-weight:600}
+
+/* ====== ÉCHELLES — PASSATION ====== */
+.echelle{max-width:760px;margin:0 auto;background:#fff;border:1px solid var(--line);border-radius:14px;padding:32px;box-shadow:var(--shadow-2)}
+.echelle h2{font-family:'Fraunces',serif;font-size:28px;font-weight:600;margin-bottom:6px}
+.echelle .e-sub{color:var(--ink-3);margin-bottom:24px;font-size:14px;line-height:1.6}
+.echelle .e-intro{background:var(--paper-2);border-left:3px solid var(--or);padding:14px 18px;border-radius:0 8px 8px 0;margin-bottom:24px;font-size:14px;line-height:1.6}
+.q{padding:18px 0;border-bottom:1px solid var(--line)}
+.q:last-of-type{border-bottom:none}
+.q-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-3);margin-bottom:6px}
+.q-text{font-size:15px;font-weight:500;margin-bottom:12px;line-height:1.5}
+.q-opts{display:flex;flex-wrap:wrap;gap:8px}
+.q-opt{
+  padding:8px 14px;border:1px solid var(--line);border-radius:8px;font-size:13px;
+  background:#fff;color:var(--ink-2);transition:all .12s;
+}
+.q-opt:hover{border-color:var(--clinic);background:var(--clinic-3)}
+.q-opt.selected{background:var(--clinic);border-color:var(--clinic);color:#fff;font-weight:600}
+.echelle-foot{margin-top:28px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.echelle-progress{flex:1;min-width:200px}
+.echelle-progress .bar{height:6px;background:var(--paper-2);border-radius:99px;overflow:hidden}
+.echelle-progress .fill{height:100%;background:var(--clinic);transition:width .3s}
+.echelle-progress .txt{font-size:12px;color:var(--ink-3);margin-top:4px}
+
+.result{max-width:760px;margin:0 auto;background:#fff;border:1px solid var(--line);border-radius:14px;padding:32px;box-shadow:var(--shadow-2)}
+.result-score{text-align:center;padding:24px 0;border-bottom:1px solid var(--line);margin-bottom:24px}
+.result-score .val{font-family:'Fraunces',serif;font-size:72px;font-weight:600;line-height:1}
+.result-score .max{color:var(--ink-3);font-size:24px}
+.result-score .label{font-size:13px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em;margin-top:8px}
+.result-interp{padding:18px;border-radius:10px;margin-bottom:20px;line-height:1.6}
+.result-interp.alert{background:var(--alert-2);border:1px solid var(--alert);color:#7a2a2a}
+.result-interp.warn{background:#FAEFD8;border:1px solid var(--warn);color:#6a4a18}
+.result-interp.ok{background:var(--sage-2);border:1px solid var(--sage);color:#2a4a3e}
+.result-interp.info{background:var(--clinic-3);border:1px solid var(--clinic-2);color:#1f3850}
+.result-interp h4{font-family:'Fraunces',serif;font-size:18px;margin-bottom:6px}
+
+/* ====== CMI ====== */
+.cmi-form .field{margin-bottom:18px}
+.cmi-form label{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
+.cmi-form .hint{font-size:12px;color:var(--ink-3);margin-bottom:6px;line-height:1.5}
+.cmi-form input[type="text"],.cmi-form input[type="date"],.cmi-form textarea,.cmi-form select{
+  width:100%;padding:10px 12px;border:1px solid var(--line-strong);border-radius:8px;background:#fff;outline:none;
+}
+.cmi-form input:focus,.cmi-form textarea:focus,.cmi-form select:focus{border-color:var(--clinic)}
+.cmi-form textarea{resize:vertical;min-height:80px;font-family:inherit}
+.cmi-preview{
+  background:#fff;border:1px solid var(--line);padding:32px;border-radius:8px;
+  font-family:'Fraunces',serif;line-height:1.7;
+}
+.cmi-preview h4{font-size:14px;font-family:'Inter',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-3);margin-top:18px;margin-bottom:6px}
+.cmi-preview h4:first-child{margin-top:0}
+.cmi-preview .cmi-header{text-align:center;border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:18px}
+.cmi-preview .cmi-header strong{font-size:18px}
+
+/* ====== NOTES ====== */
+.note-item{padding:14px 16px;border:1px solid var(--line);border-radius:10px;margin-bottom:10px;background:#fff}
+.note-item .n-head{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-3);margin-bottom:6px}
+.note-item .n-body{font-size:14px;line-height:1.6;color:var(--ink-2);white-space:pre-wrap}
+
+/* ====== MODAL ====== */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(26,23,20,.55);z-index:1000;
+  display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(2px);
+}
+.modal-overlay.show{display:flex}
+.modal{
+  background:#fff;border-radius:14px;max-width:520px;width:100%;
+  box-shadow:0 24px 64px rgba(26,23,20,.3);max-height:90vh;display:flex;flex-direction:column;
+}
+.modal-head{padding:20px 24px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.modal-head h3{font-family:'Fraunces',serif;font-size:20px;font-weight:600}
+.modal-close{font-size:20px;color:var(--ink-3);padding:4px 8px}
+.modal-body{padding:24px;overflow-y:auto;flex:1}
+.modal-foot{padding:16px 24px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px}
+
+/* ====== PATIENTE — MOBILE LIKE ====== */
+.pat-app{
+  max-width:440px;margin:0 auto;min-height:100vh;background:#fff;
+  border-left:1px solid var(--line);border-right:1px solid var(--line);
+  display:flex;flex-direction:column;
+}
+.pat-head{padding:18px 20px 12px;background:linear-gradient(180deg,var(--sage-2),#fff)}
+.pat-head .greet{font-family:'Fraunces',serif;font-size:22px;font-weight:600;letter-spacing:-.01em}
+.pat-head .greet-sub{font-size:13px;color:var(--ink-3);margin-top:2px}
+.pat-body{flex:1;padding:16px 20px;padding-bottom:80px;overflow-y:auto}
+.pat-nav{
+  position:sticky;bottom:0;background:#fff;border-top:1px solid var(--line);
+  display:grid;grid-template-columns:repeat(5,1fr);
+}
+.pat-nav-item{
+  padding:10px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;
+  font-size:10px;color:var(--ink-3);cursor:pointer;
+}
+.pat-nav-item .ic{font-size:18px}
+.pat-nav-item.active{color:var(--sage);font-weight:600}
+
+.pat-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:var(--shadow)}
+.pat-card h3{font-family:'Fraunces',serif;font-size:16px;font-weight:600;margin-bottom:8px}
+.pat-card .pc-sub{font-size:13px;color:var(--ink-3);line-height:1.6}
+
+.pat-sos{
+  background:var(--alert);color:#fff;border-radius:14px;padding:20px;
+  display:flex;align-items:center;gap:14px;margin-bottom:14px;cursor:pointer;
+}
+.pat-sos .ic{font-size:32px}
+.pat-sos .lbl{font-weight:600;font-size:15px}
+.pat-sos .sub{font-size:12px;opacity:.9}
+
+.mood-row{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:10px}
+.mood-btn{aspect-ratio:1;border-radius:10px;background:var(--paper);font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid transparent}
+.mood-btn:hover{background:var(--paper-2)}
+.mood-btn.selected{background:var(--sage-2);border-color:var(--sage)}
+
+/* Journal */
+.journal-item{background:var(--paper);border-radius:10px;padding:12px 14px;margin-bottom:10px}
+.journal-item .jd{font-size:11px;color:var(--ink-3);font-family:'JetBrains Mono',monospace}
+.journal-item .jt{font-size:14px;line-height:1.55;margin-top:4px;white-space:pre-wrap}
+.journal-item .jm{margin-top:6px;font-size:13px}
+
+/* Ancrage */
+.ancrage-step{background:var(--paper);border-radius:12px;padding:18px;margin-bottom:12px}
+.ancrage-step .as-num{font-family:'Fraunces',serif;font-size:42px;font-weight:600;color:var(--or);line-height:1}
+.ancrage-step .as-lbl{font-family:'Fraunces',serif;font-size:16px;font-weight:600;margin-top:6px}
+.ancrage-step .as-sub{font-size:13px;color:var(--ink-3);margin-top:2px;margin-bottom:10px}
+.ancrage-step input{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:#fff;margin-bottom:6px;font-size:13px;outline:none}
+.ancrage-step input:focus{border-color:var(--sage)}
+
+/* Respiration */
+.breath-wrap{display:flex;flex-direction:column;align-items:center;padding:24px 0}
+.breath-circle{
+  width:200px;height:200px;border-radius:50%;
+  background:radial-gradient(circle,var(--sage),#3a5a4d);
+  display:flex;align-items:center;justify-content:center;color:#fff;
+  font-family:'Fraunces',serif;font-size:22px;font-weight:600;
+  transition:transform 5s cubic-bezier(.4,0,.4,1);
+  box-shadow:0 0 0 0 rgba(92,131,116,.3);
+}
+.breath-circle.in{transform:scale(1.4)}
+.breath-info{margin-top:20px;text-align:center}
+.breath-info .timer{font-family:'JetBrains Mono',monospace;font-size:18px}
+.breath-info .cycle{font-size:13px;color:var(--ink-3);margin-top:4px}
+
+/* Plan sécurité */
+.plan-section{background:var(--paper);border-radius:10px;padding:14px;margin-bottom:10px}
+.plan-section h4{font-family:'Fraunces',serif;font-size:15px;font-weight:600;margin-bottom:4px}
+.plan-section .ph{font-size:12px;color:var(--ink-3);margin-bottom:8px;line-height:1.5}
+.plan-section textarea{width:100%;border:1px solid var(--line);border-radius:6px;padding:8px;background:#fff;min-height:60px;resize:vertical;font-size:13px;font-family:inherit;outline:none}
+.plan-section textarea:focus{border-color:var(--sage)}
+
+/* Urgences */
+.urg-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px;display:flex;align-items:center;gap:14px}
+.urg-card .uc-num{font-family:'Fraunces',serif;font-size:32px;font-weight:600;color:var(--clinic);min-width:80px}
+.urg-card .uc-info{flex:1}
+.urg-card .uc-name{font-weight:600;font-size:14px}
+.urg-card .uc-desc{font-size:12px;color:var(--ink-3);line-height:1.5;margin-top:2px}
+.urg-card.alert{border-color:var(--alert);background:var(--alert-2)}
+.urg-card.alert .uc-num{color:var(--alert)}
+
+/* Notes patiente */
+.empty{text-align:center;padding:40px 20px;color:var(--ink-3)}
+.empty .em-ic{font-size:32px;margin-bottom:8px;opacity:.4}
+.empty .em-t{font-size:14px;margin-bottom:2px}
+.empty .em-s{font-size:12px}
+
+/* Toast */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);
+  background:var(--ink);color:#fff;padding:12px 20px;border-radius:99px;font-size:13px;
+  z-index:2000;transition:transform .3s;
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* ====== EMDR ====== */
+.emdr-phases{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:18px}
+.emdr-phase{padding:10px 8px;border-radius:8px;background:var(--paper);border:1px solid var(--line);text-align:center;cursor:pointer;transition:all .15s}
+.emdr-phase:hover{border-color:var(--clinic)}
+.emdr-phase.done{background:var(--sage-2);border-color:var(--sage)}
+.emdr-phase.current{background:var(--clinic-3);border-color:var(--clinic);box-shadow:0 0 0 2px var(--clinic-3)}
+.emdr-phase .ep-num{font-family:'Fraunces',serif;font-size:20px;font-weight:600;line-height:1}
+.emdr-phase .ep-lbl{font-size:11px;color:var(--ink-3);margin-top:4px;line-height:1.2}
+.emdr-phase.current .ep-lbl,.emdr-phase.done .ep-lbl{color:var(--ink-2);font-weight:500}
+
+.cible{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:14px;box-shadow:var(--shadow)}
+.cible-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.cible-titre{font-family:'Fraunces',serif;font-size:16px;font-weight:600}
+.cible-type{padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.cible-type.passe{background:#FAEFD8;color:#8a6020}
+.cible-type.present{background:var(--clinic-3);color:var(--clinic)}
+.cible-type.futur{background:var(--sage-2);color:var(--sage)}
+.cible-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:12px 0;padding:12px;background:var(--paper);border-radius:8px}
+.cible-grid .cg-item .cg-lbl{font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+.cible-grid .cg-item .cg-val{font-size:13px;font-weight:500}
+.cible-sudvoc{display:flex;gap:14px;margin-top:10px}
+.cible-sudvoc .sv{flex:1}
+.cible-sudvoc .sv-lbl{font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+.cible-sudvoc .sv-val{font-family:'Fraunces',serif;font-size:20px;font-weight:600}
+.cible-sudvoc .sv-evo{font-size:11px;color:var(--ink-3);margin-top:2px}
+.cible-actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+
+.seance-emdr{padding:10px 12px;background:var(--paper);border-radius:8px;margin-bottom:6px;font-size:13px}
+.seance-emdr .se-head{display:flex;justify-content:space-between;margin-bottom:4px}
+.seance-emdr .se-d{font-weight:500}
+.seance-emdr .se-stat{font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px}
+.seance-emdr .se-stat.c{background:var(--sage-2);color:var(--sage)}
+.seance-emdr .se-stat.i{background:#FAEFD8;color:#8a6020}
+.seance-emdr .se-scores{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-3);margin-top:2px}
+
+/* ====== TCC ====== */
+.sp-card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px}
+.sp-card .sp-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.sp-theme{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;padding:2px 8px;border-radius:4px}
+.sp-theme.securite{background:var(--alert-2);color:var(--alert)}
+.sp-theme.confiance{background:#FAEFD8;color:#8a6020}
+.sp-theme.pouvoir{background:var(--clinic-3);color:var(--clinic)}
+.sp-theme.estime{background:#E8D8E8;color:#7a3a7a}
+.sp-theme.intimite{background:var(--sage-2);color:var(--sage)}
+.sp-texte{font-size:14px;font-style:italic;color:var(--ink-2);line-height:1.5}
+.sp-bar{margin-top:10px;height:8px;background:var(--paper-2);border-radius:99px;overflow:hidden;position:relative}
+.sp-bar-fill{height:100%;background:var(--clinic);transition:width .3s;border-radius:99px}
+.sp-bar-init{position:absolute;top:0;height:100%;width:2px;background:rgba(199,91,91,.6)}
+.sp-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--ink-3);margin-top:4px}
+
+.beck-row{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px}
+.beck-row .br-date{font-size:11px;color:var(--ink-3);font-family:'JetBrains Mono',monospace;margin-bottom:8px}
+.beck-grid{display:grid;grid-template-columns:1fr;gap:10px}
+@media(min-width:680px){.beck-grid{grid-template-columns:1fr 1fr 1fr}}
+.beck-cell{padding:10px;background:var(--paper);border-radius:8px}
+.beck-cell .bc-lbl{font-size:10px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;font-weight:600}
+.beck-cell .bc-txt{font-size:13px;line-height:1.45}
+.beck-cell .bc-bar{margin-top:6px;height:4px;background:var(--paper-2);border-radius:99px;overflow:hidden}
+.beck-cell .bc-bar-fill{height:100%;border-radius:99px}
+.beck-cell.before .bc-bar-fill{background:var(--alert)}
+.beck-cell.after .bc-bar-fill{background:var(--sage)}
+.beck-arrow{text-align:center;font-size:18px;color:var(--ink-3);margin:8px 0}
+
+.expo-item{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px}
+.expo-item.complete{background:var(--sage-2);border-color:var(--sage)}
+.expo-item .ei-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px}
+.expo-item .ei-titre{font-size:14px;font-weight:500;flex:1}
+.expo-item .ei-suds{display:flex;align-items:center;gap:12px;margin-top:8px}
+.expo-item .ei-sud{flex:1;text-align:center;padding:8px;background:var(--paper);border-radius:6px}
+.expo-item .ei-sud-lbl{font-size:10px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em}
+.expo-item .ei-sud-val{font-family:'Fraunces',serif;font-size:18px;font-weight:600;line-height:1.2}
+.expo-item .ei-sud.init .ei-sud-val{color:var(--alert)}
+.expo-item .ei-sud.curr .ei-sud-val{color:var(--warn)}
+.expo-item .ei-sud.obj .ei-sud-val{color:var(--sage)}
+.expo-arrow{font-size:14px;color:var(--ink-3)}
+
+/* Sliders */
+.slider-row{display:flex;align-items:center;gap:12px;margin-top:8px}
+.slider-row input[type=range]{flex:1}
+.slider-row .sr-val{font-family:'JetBrains Mono',monospace;font-weight:600;min-width:36px;text-align:right}
+
+/* ====== PATIENTE — PAGES BECK + EXPO ====== */
+.pat-beck-item{background:var(--paper);border-radius:10px;padding:12px;margin-bottom:10px}
+.pat-beck-item .pb-d{font-size:11px;color:var(--ink-3);font-family:'JetBrains Mono',monospace;margin-bottom:6px}
+.pat-beck-item .pb-row{display:flex;gap:8px;margin-top:4px}
+.pat-beck-item .pb-cell{flex:1;font-size:12px}
+.pat-beck-item .pb-cell .pbc-lbl{font-size:10px;color:var(--ink-3);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+
+/* Responsive */
+@media(max-width:880px){
+  .sidebar{width:240px}
+  .main-head h1{font-size:22px}
+  .main-body{padding:16px}
+}
+@media(max-width:680px){
+  .app{flex-direction:column}
+  .sidebar{width:100%;border-right:none;border-bottom:1px solid var(--line);max-height:50vh}
+  .main-tabs{padding:0 16px}
+  .echelle{padding:20px}
+  .home-logo{font-size:56px}
+}
+
+/* Utils */
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.row > *{flex:1;min-width:0}
+.mt-1{margin-top:8px}.mt-2{margin-top:16px}.mt-3{margin-top:24px}
+.mb-1{margin-bottom:8px}.mb-2{margin-bottom:16px}.mb-3{margin-bottom:24px}
+.text-sm{font-size:13px}.text-xs{font-size:12px}.text-muted{color:var(--ink-3)}
+.flex{display:flex}.flex-1{flex:1}.gap-2{gap:8px}.gap-3{gap:12px}.items-center{align-items:center}.justify-between{justify-content:space-between}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<button class="exit-btn" onclick="sortieRapide()" title="Sortie rapide (ou touche Échap)">
+  <span>↗ Sortir</span>
+  <span class="kbd">Échap</span>
+</button>
+
+<div id="app"></div>
+
+<div id="toast" class="toast"></div>
+
+<div id="modal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="modal-title">Titre</h3>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-foot" id="modal-foot"></div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   AÏA — État, persistance, routage
+   ============================================================ */
+
+const STORE_KEY = 'aia_v0_3';
+
+const DEFAULT_STATE = {
+  patientes: [],
+  journal: [],
+  plan_securite: {
+    signaux:'', strategies:'', contacts_surs:'', lieux_surs:'',
+    objets:'', professionnels:'', code:'', depart:''
+  },
+  exercices:[],
+  initialized:false
+};
+
+let state = loadState();
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return JSON.parse(JSON.stringify(DEFAULT_STATE));
+}
+
+function saveState(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){}
+}
+
+function uuid(){ return 'p_'+Math.random().toString(36).substr(2,9); }
+
+/* ============================================================
+   Données démo — Anaïs M., chargée au premier lancement
+   ============================================================ */
+
+function seedDemo(){
+  if(state.initialized) return;
+  const id = uuid();
+  const today = new Date();
+  const dAgo = d => new Date(today.getTime() - d*86400000).toISOString().slice(0,10);
+
+  state.patientes.push({
+    id, prenom:'Anaïs', nom_initial:'M.', age:34,
+    premier_contact: dAgo(98),
+    notes:[
+      { date: dAgo(98), texte: 'Première consultation. Adressée par MG. Pleurs intermittents. Décrit conjoint contrôlant, surveillance téléphone, isolement progressif depuis 3 ans. Pas de violences physiques rapportées initialement.\n\nDemande de pouvoir reparler la semaine prochaine. WAST passé.' },
+      { date: dAgo(84), texte: 'Confie un épisode d\'agression physique survenu il y a 6 mois (gifle, main au cou). Honte forte. Réveils nocturnes, cauchemars. Plan de sécurité ébauché. DA proposé — refus initial, à représenter.' },
+      { date: dAgo(63), texte: 'DA accepté. Score 16/20 — danger sévère. Identifie 2 facteurs aggravants : armes au domicile (chasse), accès récent à information sur sa séparation. Adresse 3919 + association locale. Refuse plainte pour le moment.' },
+      { date: dAgo(42), texte: 'Séparation effective depuis 12 jours. Hébergée chez sa sœur. Cauchemars persistants. Hypervigilance. PCL-5 à 41. Indication EMDR — adressage Mme G. (EMDR-Europe). Sommeil : zopiclone PRN.' },
+      { date: dAgo(21), texte: '3e séance EMDR en cours. Évite zone domicile. Reprise travail à temps partiel. Amélioration sommeil. PHQ-9 baisse. CMI rédigé sur sa demande pour dossier civil (divorce + garde).' },
+      { date: dAgo(4), texte: 'Stabilisation. Pas de contact partenaire depuis 6 semaines. Suit groupe de parole hebdo. Pose la question d\'arrêter le zopiclone — accord pour décroissance progressive. Prochaine éval échelles dans 4 semaines.' }
+    ],
+    echelles:[
+      { nom:'WAST', date:dAgo(98), score:12, max:16, items:{}, interpretation:'sévère' },
+      { nom:'WAST', date:dAgo(56), score:10, max:16, items:{}, interpretation:'modéré' },
+      { nom:'WAST', date:dAgo(14), score:8, max:16, items:{}, interpretation:'modéré' },
+      { nom:'DA', date:dAgo(84), score:16, max:20, items:{}, interpretation:'sévère' },
+      { nom:'DA', date:dAgo(42), score:11, max:20, items:{}, interpretation:'accru' },
+      { nom:'PCL-5', date:dAgo(84), score:52, max:80, items:{}, interpretation:'élevé' },
+      { nom:'PCL-5', date:dAgo(56), score:48, max:80, items:{}, interpretation:'élevé' },
+      { nom:'PCL-5', date:dAgo(28), score:41, max:80, items:{}, interpretation:'élevé' },
+      { nom:'PCL-5', date:dAgo(7), score:36, max:80, items:{}, interpretation:'modéré' },
+      { nom:'PHQ-9', date:dAgo(84), score:18, max:27, items:{}, interpretation:'modérément sévère' },
+      { nom:'PHQ-9', date:dAgo(56), score:16, max:27, items:{}, interpretation:'modérément sévère' },
+      { nom:'PHQ-9', date:dAgo(28), score:13, max:27, items:{}, interpretation:'modéré' },
+      { nom:'PHQ-9', date:dAgo(7), score:11, max:27, items:{}, interpretation:'modéré' },
+      { nom:'GAD-7', date:dAgo(84), score:15, max:21, items:{}, interpretation:'sévère' },
+      { nom:'GAD-7', date:dAgo(28), score:11, max:21, items:{}, interpretation:'modéré' }
+    ],
+    plan_securite:{
+      signaux:'Voix qui monte, alcool, retours tardifs, accusations infondées.',
+      strategies:'Ne pas répondre à la provocation. M\'éloigner vers la salle de bain (verrou). Garder téléphone sur moi.',
+      contacts_surs:'Sœur (Camille) — 06 XX XX XX XX\nMédecin traitant — Dr P.\nVoisine palier — Mme T.',
+      lieux_surs:'Domicile de ma sœur (15 min en métro)\nCabinet médecin (joignable 9h-19h)\nCommissariat 3e arr.',
+      objets:'Pièce identité + Vitale + permis\nCarte bancaire + 200€ liquide\nClé USB documents importants\nTélé + chargeur\nTraitement en cours\nVêtements rechange',
+      professionnels:'3919 / 17\nAvocate — Me L. (RDV pris)\nAssociation départ (réseau FNSF)\nPsychiatre (Dr) — RDV hebdo',
+      code:'"Je viens prendre le café" envoyé à Camille = situation grave',
+      depart:'Sac prêt chez Camille. Documents scannés (cloud sécurisé). Procuration bancaire signée. Plan testé une fois (visite chez Camille avec sac).'
+    },
+    cmi:[
+      { date: dAgo(28), itt: 15, contenu: 'Voir détail dans onglet CMI.' }
+    ],
+    emdr:{
+      phase_actuelle: 4,
+      lieu_sur: 'Maison de ma grand-mère à Quiberon — jardin avec figuier, son des vagues au loin, odeur de pin chauffé par le soleil. Sentiment d\'être en sécurité, accueillie sans condition.',
+      ressources:[
+        'Camille (sœur) — voix calme, "je suis là"',
+        'Souvenir de la naissance de sa fille — joie pure',
+        'Image personnelle de combativité — randonnée GR20 terminée seule en 2019'
+      ],
+      cibles:[
+        {
+          id:'c1', type:'passé',
+          titre:'Première gifle (mariage de Pauline, 2023)',
+          image:'Couloir des toilettes du restaurant, sa main qui revient, sentiment de glace',
+          cn:{ texte:'Je n\'ai pas vu venir, c\'est ma faute', categorie:'responsabilite' },
+          cp:{ texte:'J\'ai fait ce que je pouvais. Ce qu\'il a fait, c\'est lui.' },
+          voc_initial:2, sud_initial:8, voc_actuel:6, sud_actuel:2,
+          emotion:'sidération, honte', sensation:'gorge serrée, jambes faibles',
+          status:'en cours',
+          seances:[
+            { date:dAgo(56), sud_debut:8, voc_debut:2, sud_fin:5, voc_fin:3, complete:false, sensation_residuelle:'pression thoracique', notes:'Séance interrompue par montée émotionnelle. Retour au lieu sûr.' },
+            { date:dAgo(42), sud_debut:5, voc_debut:3, sud_fin:3, voc_fin:5, complete:false, sensation_residuelle:'légère tension dans le cou', notes:'Bonne progression. Émergence du souvenir de son père la giflant à 12 ans — à cibler.' },
+            { date:dAgo(28), sud_debut:3, voc_debut:5, sud_fin:2, voc_fin:6, complete:true, sensation_residuelle:'apaisement', notes:'Séance complète. Phase 6 (body scan) ok. Installation CP "J\'ai fait ce que je pouvais" à 6/7. À réévaluer en début de prochaine séance.' }
+          ]
+        },
+        {
+          id:'c2', type:'passé',
+          titre:'Étranglement (cuisine, novembre 2024)',
+          image:'Sa main sur ma gorge contre le réfrigérateur, sentiment "je vais mourir"',
+          cn:{ texte:'Je vais mourir, je suis sans défense', categorie:'securite' },
+          cp:{ texte:'C\'est fini, je suis vivante, je suis en sécurité maintenant' },
+          voc_initial:1, sud_initial:10, voc_actuel:3, sud_actuel:7,
+          emotion:'terreur, impuissance', sensation:'oppression thoracique, gorge serrée',
+          status:'en cours',
+          seances:[
+            { date:dAgo(14), sud_debut:10, voc_debut:1, sud_fin:7, voc_fin:3, complete:false, sensation_residuelle:'gorge encore serrée', notes:'Cible chargée. Décision conjointe de fragmenter (EMD plutôt que EMDR complète). Émergence de plusieurs souvenirs en cascade. Clôture sécurisée.' }
+          ]
+        },
+        {
+          id:'c3', type:'présent',
+          titre:'Voir un homme s\'énerver en public',
+          image:'Couple qui se dispute dans le métro la semaine dernière',
+          cn:{ texte:'Je suis en danger', categorie:'securite' },
+          cp:{ texte:'Je peux distinguer le passé du présent. Ici, maintenant, je suis en sécurité.' },
+          voc_initial:3, sud_initial:6, voc_actuel:3, sud_actuel:6,
+          emotion:'panique, envie de fuir', sensation:'cœur qui s\'emballe',
+          status:'à traiter',
+          seances:[]
+        }
+      ]
+    },
+    tcc:{
+      approche:'CPT + éléments PE',
+      impact_statement:'« J\'ai grandi en pensant que l\'amour, c\'était quand quelqu\'un veut bien rester avec toi. Quand il a commencé à crier, j\'ai cru que c\'était l\'amour qui se révélait. Quand il m\'a frappée, j\'ai pensé que j\'avais dû provoquer ça. Aujourd\'hui je commence à comprendre que ce n\'était pas de l\'amour, et que ce n\'était pas moi. »',
+      stuck_points:[
+        { id:'sp1', theme:'estime', texte:'Je dois être une femme défaillante pour qu\'un homme me fasse ça.', force_initiale:90, force_actuelle:30, historique:[{date:dAgo(70),force:90},{date:dAgo(42),force:65},{date:dAgo(14),force:30}] },
+        { id:'sp2', theme:'securite', texte:'Le monde est dangereux, on ne peut faire confiance à personne.', force_initiale:85, force_actuelle:55, historique:[{date:dAgo(70),force:85},{date:dAgo(42),force:70},{date:dAgo(14),force:55}] },
+        { id:'sp3', theme:'pouvoir', texte:'Je n\'ai aucun contrôle sur ce qui m\'arrive.', force_initiale:80, force_actuelle:35, historique:[{date:dAgo(70),force:80},{date:dAgo(42),force:55},{date:dAgo(14),force:35}] },
+        { id:'sp4', theme:'confiance', texte:'Si je fais à nouveau confiance à un homme, il me fera du mal.', force_initiale:95, force_actuelle:75, historique:[{date:dAgo(70),force:95},{date:dAgo(42),force:85},{date:dAgo(14),force:75}] },
+        { id:'sp5', theme:'intimite', texte:'L\'intimité physique est dangereuse pour moi.', force_initiale:80, force_actuelle:60, historique:[{date:dAgo(70),force:80},{date:dAgo(14),force:60}] }
+      ],
+      beck_table:[
+        { id:'b1', date:dAgo(35), situation:'Voisin de palier qui me salue trop chaleureusement le matin', emotion:'Peur, agacement', intensite_emo:75, pensee_auto:'Il veut quelque chose de moi, je dois me méfier', croyance_pa:85, pensee_alt:'C\'est probablement un voisin sympathique. Toutes les attentions des hommes ne sont pas dangereuses. Je peux rester polie et garder mes distances naturelles.', croyance_alt:55, reeval_emo:45 },
+        { id:'b2', date:dAgo(21), situation:'Reçue à un entretien d\'embauche par un homme âgé', emotion:'Panique, envie de fuir', intensite_emo:90, pensee_auto:'Je vais être incompétente, je vais échouer comme partout', croyance_pa:80, pensee_alt:'J\'ai des compétences avérées (5 ans dans le même poste, recommandations). Mes peurs liées à mon ex débordent sur cette situation. Cet homme évalue mon travail, pas ma personne.', croyance_alt:65, reeval_emo:55 },
+        { id:'b3', date:dAgo(7), situation:'Charles (collègue) m\'invite à un café', emotion:'Anxiété, méfiance', intensite_emo:70, pensee_auto:'Tout homme qui me propose quelque chose veut me piéger', croyance_pa:75, pensee_alt:'Charles est marié, sympathique, c\'est probablement une attention collégiale. Je peux accepter ou refuser librement, je suis maître de mes choix.', croyance_alt:70, reeval_emo:40 }
+      ],
+      hierarchie:[
+        { id:'h1', situation:'Marcher seule dans mon ancien quartier (1 km du domicile conjugal)', suds_initial:95, suds_actuel:70, suds_objectif:30, complete:false, historique:[{date:dAgo(35),suds:95},{date:dAgo(14),suds:70}] },
+        { id:'h2', situation:'Prendre le métro aux heures de pointe', suds_initial:80, suds_actuel:40, suds_objectif:25, complete:false, historique:[{date:dAgo(35),suds:80},{date:dAgo(14),suds:40}] },
+        { id:'h3', situation:'Rester seule au domicile de Camille (sœur) le soir', suds_initial:70, suds_actuel:20, suds_objectif:15, complete:true, historique:[{date:dAgo(56),suds:70},{date:dAgo(21),suds:20}] },
+        { id:'h4', situation:'Reprendre une activité sportive en groupe mixte', suds_initial:85, suds_actuel:85, suds_objectif:35, complete:false, historique:[{date:dAgo(7),suds:85}] },
+        { id:'h5', situation:'Repasser devant l\'ancien domicile conjugal', suds_initial:100, suds_actuel:100, suds_objectif:50, complete:false, historique:[{date:dAgo(7),suds:100}] }
+      ]
+    }
+  });
+
+  // Ajouter quelques nouvelles passations pour les nouvelles échelles
+  const pat = state.patientes[0];
+  pat.echelles.push(
+    { nom:'PTCI-9', date:dAgo(70), score:48, max:63, items:{}, interpretation:'cognitions sévèrement négatives' },
+    { nom:'PTCI-9', date:dAgo(42), score:39, max:63, items:{}, interpretation:'cognitions négatives marquées' },
+    { nom:'PTCI-9', date:dAgo(14), score:28, max:63, items:{}, interpretation:'cognitions modérément négatives' },
+    { nom:'IES-R', date:dAgo(70), score:42, max:52, items:{}, interpretation:'symptomatologie ESPT sévère' },
+    { nom:'IES-R', date:dAgo(35), score:30, max:52, items:{}, interpretation:'symptomatologie ESPT probable' },
+    { nom:'IES-R', date:dAgo(7), score:21, max:52, items:{}, interpretation:'symptomatologie partielle' },
+    { nom:'ITQ', date:dAgo(63), score:48, max:72, items:{}, interpretation:'TSPT-Complexe probable (CIM-11)' },
+    { nom:'ITQ', date:dAgo(14), score:28, max:72, items:{}, interpretation:'PTSD probable (CIM-11)' },
+    { nom:'DES-T', date:dAgo(70), score:120, max:800, items:{}, interpretation:'dissociation modérée' },
+    { nom:'DES-T', date:dAgo(14), score:64, max:800, items:{}, interpretation:'dissociation modérée' }
+  );
+
+  state.initialized = true;
+  saveState();
+}
+
+/* ============================================================
+   Définitions des échelles (paraphrasées pour démo)
+   Sources : WAST (Brown 1996, validation FR BEH 2021),
+             DA (Campbell 2009), PCL-5 (Weathers 2013),
+             PHQ-9 (Kroenke 2001), GAD-7 (Spitzer 2006)
+   Versions présentées : adaptations cliniques pour prototype.
+   Production = utiliser versions officielles validées.
+   ============================================================ */
+
+const ECHELLES = {
+  'WAST':{
+    nom:'WAST', titre:'WAST — Repérage des violences conjugales',
+    sub:'Woman Abuse Screening Tool · 8 items · seuil de signal ≥ 5/16',
+    intro:'Outil de repérage des violences au sein du couple, validé en français (BEH n°2, 2021, Clermont-Ferrand). À passer en consultation sans jugement, après explication du contexte. Version paraphrasée — utiliser la version officielle validée en production clinique.',
+    items:[
+      { q:'En général, comment décririez-vous votre relation de couple ?', o:[['Sans tension',0],['Un peu de tension',1],['Beaucoup de tension',2]] },
+      { q:'Vous et votre partenaire — quand vous êtes en désaccord, comment cela se règle ?', o:[['Sans difficulté',0],['Avec un peu de difficulté',1],['Avec beaucoup de difficulté',2]] },
+      { q:'Vos disputes vous laissent-elles avec un sentiment d\'humiliation ou d\'écrasement ?', o:[['Jamais',0],['Parfois',1],['Souvent',2]] },
+      { q:'Vous arrive-t-il d\'avoir peur de ce que votre partenaire dit ou fait ?', o:[['Jamais',0],['Parfois',1],['Souvent',2]] },
+      { q:'Votre partenaire vous a-t-il déjà fait du mal physiquement ?', o:[['Jamais',0],['Parfois',1],['Souvent',2]] },
+      { q:'Votre partenaire vous a-t-il déjà fait du mal émotionnellement (insultes, menaces, humiliations) ?', o:[['Jamais',0],['Parfois',1],['Souvent',2]] },
+      { q:'Votre partenaire vous a-t-il déjà imposé un acte sexuel que vous ne souhaitiez pas ?', o:[['Jamais',0],['Parfois',1],['Souvent',2]] },
+      { q:'Votre partenaire contrôle-t-il votre argent, vos sorties, ou vos relations ?', o:[['Jamais',0],['Parfois',1],['Souvent',2]] }
+    ],
+    score(items){
+      const total = Object.values(items).reduce((a,b)=>a+b,0);
+      let interp = 'absence de signal', cls = 'ok', txt = 'Score sous le seuil. Rester attentif aux indices indirects (somatisations, retards, troubles du sommeil, isolement). La répétition du repérage à distance est recommandée.';
+      if(total >= 5){ interp = 'signal de violence probable'; cls = 'warn'; txt = 'Score au-dessus du seuil. Approfondir l\'entretien dans un cadre sécurisé. Évaluer le danger immédiat (DA). Informer des ressources (3919, associations). Documenter par CMI si lésions ou sur demande.'; }
+      if(total >= 10){ interp = 'situation de violence sévère'; cls = 'alert'; txt = 'Score élevé. Situation de violences vraisemblablement installée et sévère. Évaluation du danger (DA) prioritaire. Plan de sécurité. CMI. Information du 3919 et orientation vers réseau spécialisé. Si enfants au domicile, vigilance art. 226-14 CP.'; }
+      return { total, max:16, interpretation:interp, message:txt, cls };
+    }
+  },
+  'DA':{
+    nom:'DA', titre:'Danger Assessment — Évaluation du risque létal',
+    sub:'Campbell 2009 · 15 items oui/non · prédiction du risque d\'homicide conjugal',
+    intro:'Échelle de référence internationale pour évaluer le risque de létalité dans les situations de violences conjugales. À utiliser après repérage positif (WAST), idéalement de manière chronologique sur l\'année écoulée. Version simplifiée pour démo.',
+    items:[
+      { q:'La violence physique s\'est-elle aggravée en fréquence ou en intensité ces 12 derniers mois ?', o:[['Non',0],['Oui',1]] },
+      { q:'Possède-t-il une arme à feu ou un accès facile à une arme ?', o:[['Non',0],['Oui',1]] },
+      { q:'Avez-vous quitté ou tenté de quitter le domicile dans les 12 derniers mois ?', o:[['Non',0],['Oui',1]] },
+      { q:'Est-il sans emploi ?', o:[['Non',0],['Oui',1]] },
+      { q:'A-t-il déjà utilisé une arme contre vous, ou menacé de le faire ?', o:[['Non',0],['Oui',1]] },
+      { q:'A-t-il menacé de vous tuer ?', o:[['Non',0],['Oui',1]] },
+      { q:'A-t-il déjà tenté de vous étrangler ?', o:[['Non',0],['Oui',1]] },
+      { q:'Consomme-t-il drogues illicites ou alcool de manière régulière et excessive ?', o:[['Non',0],['Oui',1]] },
+      { q:'Contrôle-t-il la plupart de vos activités quotidiennes ?', o:[['Non',0],['Oui',1]] },
+      { q:'Est-il violemment jaloux ("Si je ne t\'ai pas, personne ne t\'aura") ?', o:[['Non',0],['Oui',1]] },
+      { q:'Avez-vous été battue pendant une grossesse ?', o:[['Non',0],['Oui',1]] },
+      { q:'A-t-il déjà menacé ou tenté de se suicider ?', o:[['Non',0],['Oui',1]] },
+      { q:'Menace-t-il vos enfants ?', o:[['Non',0],['Oui',1]] },
+      { q:'Pensez-vous qu\'il est capable de vous tuer ?', o:[['Non',0],['Oui',1]] },
+      { q:'A-t-il fait preuve de violence en dehors du domicile (bagarres, etc.) ?', o:[['Non',0],['Oui',1]] }
+    ],
+    score(items){
+      const total = Object.values(items).reduce((a,b)=>a+b,0);
+      let interp,cls,txt;
+      if(total < 8){ interp='danger variable'; cls='info'; txt='Risque létal présent mais variable. Approfondir le contexte. Plan de sécurité simple. Réévaluation régulière. Documenter.'; }
+      else if(total < 14){ interp='danger accru'; cls='warn'; txt='Risque létal significatif. Plan de sécurité formalisé. Information 3919 + association. Évaluer mise à l\'abri. Documenter par CMI. Informer la patiente sans alarmisme du niveau de risque.'; }
+      else if(total < 18){ interp='danger sévère'; cls='alert'; txt='Risque létal élevé. Mise à l\'abri à envisager activement. Coordination réseau (3919, justice, hébergement spécialisé). Téléphone Grave Danger (TGD) à évoquer avec procureur si éligible. Vigilance enfants (art. 226-14 CP). CMI systématique.'; }
+      else { interp='danger extrême'; cls='alert'; txt='RISQUE EXTRÊME. Mise à l\'abri immédiate à organiser. Signalement art. 226-14 CP (avec ou sans accord patiente si danger imminent). TGD. Coordination urgente police / parquet. CMI immédiat. Hébergement d\'urgence.'; }
+      return { total, max:20, interpretation:interp, message:txt, cls };
+    }
+  },
+  'PCL-5':{
+    nom:'PCL-5', titre:'PCL-5 — État de stress post-traumatique (DSM-5)',
+    sub:'PTSD Checklist · 20 items · seuil ≥ 33',
+    intro:'Auto-questionnaire de référence pour évaluer la symptomatologie ESPT selon les critères DSM-5. Évalue les 4 dimensions : intrusion (B), évitement (C), altérations cognitives/humeur (D), hypervigilance (E). Sur les 4 dernières semaines.',
+    items:[
+      { q:'Souvenirs répétés, dérangeants et non désirés de l\'événement', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Énormément',4]] },
+      { q:'Rêves répétés et dérangeants liés à l\'événement', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Énormément',4]] },
+      { q:'Impression soudaine que l\'événement se reproduisait (flashback)', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Énormément',4]] },
+      { q:'Sentiment de bouleversement quand un rappel évoque l\'événement', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Énormément',4]] },
+      { q:'Réactions physiques (palpitations, sueurs) lors de rappels', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Énormément',4]] },
+      { q:'Éviter les souvenirs, pensées ou sentiments liés', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Énormément',4]] },
+      { q:'Éviter rappels externes (lieux, personnes, activités)', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Énormément',4]] },
+      { q:'Difficulté à se souvenir d\'aspects importants de l\'événement', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Énormément',4]] },
+      { q:'Croyances négatives fortes sur soi, les autres ou le monde', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Énormément',4]] },
+      { q:'Se blâmer ou blâmer autrui pour l\'événement ou ses suites', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Énormément',4]] },
+      { q:'Émotions négatives persistantes (peur, colère, honte, culpabilité)', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Énormément',4]] },
+      { q:'Perte d\'intérêt pour des activités auparavant appréciées', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Énormément',4]] },
+      { q:'Sentiment de détachement ou d\'éloignement vis-à-vis des autres', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Énormément',4]] },
+      { q:'Difficulté à éprouver des émotions positives', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Énormément',4]] },
+      { q:'Comportement irritable ou accès de colère', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Énormément',4]] },
+      { q:'Conduites à risque ou autodestructrices', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Énormément',4]] },
+      { q:'Hypervigilance ("super-alerte", sur ses gardes)', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Énormément',4]] },
+      { q:'Sursauts exagérés', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Énormément',4]] },
+      { q:'Difficultés de concentration', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Énormément',4]] },
+      { q:'Difficultés d\'endormissement ou de maintien du sommeil', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Énormément',4]] }
+    ],
+    score(items){
+      const total = Object.values(items).reduce((a,b)=>a+b,0);
+      let interp,cls,txt;
+      if(total < 33){ interp='sous seuil'; cls='ok'; txt='Score sous le seuil clinique d\'ESPT probable. Surveiller l\'évolution. Considérer comorbidités (dépression, anxiété, dissociation).'; }
+      else if(total < 50){ interp='ESPT probable — intensité modérée'; cls='warn'; txt='Probable état de stress post-traumatique d\'intensité modérée. Évaluation clinique complémentaire. Indication psychothérapie traumafocalisée (EMDR, TCC-CT). Évaluer dissociation (DES) si tableau clinique évocateur.'; }
+      else { interp='ESPT probable — intensité sévère'; cls='alert'; txt='ESPT probable, intensité sévère. Prise en charge psychothérapeutique spécialisée. Évaluer indication médicamenteuse (ISRS, ISRSNa). Surveiller idéations suicidaires. Adresser réseau spécialisé psychotraumatologie (Cn2r).'; }
+      return { total, max:80, interpretation:interp, message:txt, cls };
+    }
+  },
+  'PHQ-9':{
+    nom:'PHQ-9', titre:'PHQ-9 — Dépression',
+    sub:'Patient Health Questionnaire · 9 items · 2 dernières semaines',
+    intro:'Auto-questionnaire de référence pour dépister et évaluer la sévérité d\'un épisode dépressif. Sur les 2 dernières semaines, à quelle fréquence avez-vous été dérangée par les problèmes suivants ?',
+    items:[
+      { q:'Peu d\'intérêt ou de plaisir à faire les choses', o:[['Jamais',0],['Plusieurs jours',1],['Plus de la moitié',2],['Presque chaque jour',3]] },
+      { q:'Sentiment de tristesse, déprime, désespoir', o:[['Jamais',0],['Plusieurs jours',1],['Plus de la moitié',2],['Presque chaque jour',3]] },
+      { q:'Difficultés à s\'endormir, à rester endormie, ou sommeil excessif', o:[['Jamais',0],['Plusieurs jours',1],['Plus de la moitié',2],['Presque chaque jour',3]] },
+      { q:'Sensation de fatigue ou manque d\'énergie', o:[['Jamais',0],['Plusieurs jours',1],['Plus de la moitié',2],['Presque chaque jour',3]] },
+      { q:'Mauvais appétit ou suralimentation', o:[['Jamais',0],['Plusieurs jours',1],['Plus de la moitié',2],['Presque chaque jour',3]] },
+      { q:'Mauvaise opinion de vous-même, sentiment d\'échec', o:[['Jamais',0],['Plusieurs jours',1],['Plus de la moitié',2],['Presque chaque jour',3]] },
+      { q:'Difficultés à se concentrer (lecture, télévision)', o:[['Jamais',0],['Plusieurs jours',1],['Plus de la moitié',2],['Presque chaque jour',3]] },
+      { q:'Lenteur ou agitation perceptible par les autres', o:[['Jamais',0],['Plusieurs jours',1],['Plus de la moitié',2],['Presque chaque jour',3]] },
+      { q:'Pensées qu\'il vaudrait mieux mourir, ou de vous faire du mal', o:[['Jamais',0],['Plusieurs jours',1],['Plus de la moitié',2],['Presque chaque jour',3]] }
+    ],
+    score(items){
+      const total = Object.values(items).reduce((a,b)=>a+b,0);
+      const idee_suicide = (items[8] || 0) > 0;
+      let interp,cls,txt;
+      if(total < 5){ interp='symptômes minimaux'; cls='ok'; txt='Pas de dépression cliniquement significative.'; }
+      else if(total < 10){ interp='dépression légère'; cls='info'; txt='Dépression légère. Soutien clinique. Réévaluation à 2-4 semaines.'; }
+      else if(total < 15){ interp='dépression modérée'; cls='warn'; txt='Dépression modérée. Indication d\'une prise en charge active (psychothérapie ± antidépresseur).'; }
+      else if(total < 20){ interp='dépression modérément sévère'; cls='alert'; txt='Dépression modérément sévère. Antidépresseur + psychothérapie. Surveillance idéation suicidaire.'; }
+      else { interp='dépression sévère'; cls='alert'; txt='Dépression sévère. Traitement immédiat. Évaluer indication hospitalisation. Surveillance étroite idéations.'; }
+      if(idee_suicide) txt += ' ⚠ Item 9 positif : évaluer impérativement le risque suicidaire (3114 si crise).';
+      return { total, max:27, interpretation:interp, message:txt, cls };
+    }
+  },
+  'GAD-7':{
+    nom:'GAD-7', titre:'GAD-7 — Anxiété généralisée',
+    sub:'Generalized Anxiety Disorder · 7 items · 2 dernières semaines',
+    intro:'Auto-questionnaire pour dépister et évaluer la sévérité de l\'anxiété généralisée. Sur les 2 dernières semaines, à quelle fréquence avez-vous été dérangée par les problèmes suivants ?',
+    items:[
+      { q:'Sentiment de nervosité, d\'anxiété ou de tension', o:[['Jamais',0],['Plusieurs jours',1],['Plus de la moitié',2],['Presque chaque jour',3]] },
+      { q:'Incapacité d\'arrêter ou de contrôler vos inquiétudes', o:[['Jamais',0],['Plusieurs jours',1],['Plus de la moitié',2],['Presque chaque jour',3]] },
+      { q:'Inquiétude excessive à propos de tout et de rien', o:[['Jamais',0],['Plusieurs jours',1],['Plus de la moitié',2],['Presque chaque jour',3]] },
+      { q:'Difficulté à vous détendre', o:[['Jamais',0],['Plusieurs jours',1],['Plus de la moitié',2],['Presque chaque jour',3]] },
+      { q:'Agitation telle qu\'il est difficile de tenir en place', o:[['Jamais',0],['Plusieurs jours',1],['Plus de la moitié',2],['Presque chaque jour',3]] },
+      { q:'Tendance à être facilement contrariée ou irritable', o:[['Jamais',0],['Plusieurs jours',1],['Plus de la moitié',2],['Presque chaque jour',3]] },
+      { q:'Sentiment d\'avoir peur comme si quelque chose de terrible allait arriver', o:[['Jamais',0],['Plusieurs jours',1],['Plus de la moitié',2],['Presque chaque jour',3]] }
+    ],
+    score(items){
+      const total = Object.values(items).reduce((a,b)=>a+b,0);
+      let interp,cls,txt;
+      if(total < 5){ interp='minimal'; cls='ok'; txt='Anxiété minimale. Pas d\'indication de prise en charge spécifique.'; }
+      else if(total < 10){ interp='léger'; cls='info'; txt='Anxiété légère. Surveillance, psychoéducation.'; }
+      else if(total < 15){ interp='modéré'; cls='warn'; txt='Anxiété modérée. Indication TCC et/ou traitement médicamenteux.'; }
+      else { interp='sévère'; cls='alert'; txt='Anxiété sévère. Prise en charge active recommandée. Évaluer comorbidités (dépression, ESPT).'; }
+      return { total, max:21, interpretation:interp, message:txt, cls };
+    }
+  },
+  'PTCI-9':{
+    nom:'PTCI-9', titre:'PTCI-9 — Cognitions post-traumatiques',
+    sub:'Posttraumatic Cognitions Inventory (Foa 1999, version courte 9 items)',
+    intro:'Évalue les cognitions négatives post-trauma sur 3 dimensions : pensées négatives sur soi (SELF), sur le monde (WORLD), auto-accusation (BLAME). Outil de référence en CPT pour mesurer l\'évolution des "stuck points" sous restructuration cognitive. Score moyen utile (PTCI-9 score / 9, échelle 1-7). Version paraphrasée pour démo.',
+    items:[
+      { q:'Je ne fais plus confiance à mon jugement.', o:[['Totalement faux',1],['Très faux',2],['Légèrement faux',3],['Neutre',4],['Légèrement vrai',5],['Très vrai',6],['Totalement vrai',7]] },
+      { q:'Je me sens inadéquate.', o:[['Totalement faux',1],['Très faux',2],['Légèrement faux',3],['Neutre',4],['Légèrement vrai',5],['Très vrai',6],['Totalement vrai',7]] },
+      { q:'Je n\'arriverai pas à reprendre le contrôle de ma vie.', o:[['Totalement faux',1],['Très faux',2],['Légèrement faux',3],['Neutre',4],['Légèrement vrai',5],['Très vrai',6],['Totalement vrai',7]] },
+      { q:'On ne peut jamais savoir qui peut vous faire du mal.', o:[['Totalement faux',1],['Très faux',2],['Légèrement faux',3],['Neutre',4],['Légèrement vrai',5],['Très vrai',6],['Totalement vrai',7]] },
+      { q:'Le monde est un endroit dangereux.', o:[['Totalement faux',1],['Très faux',2],['Légèrement faux',3],['Neutre',4],['Légèrement vrai',5],['Très vrai',6],['Totalement vrai',7]] },
+      { q:'Il faut être très méfiante envers les autres.', o:[['Totalement faux',1],['Très faux',2],['Légèrement faux',3],['Neutre',4],['Légèrement vrai',5],['Très vrai',6],['Totalement vrai',7]] },
+      { q:'L\'événement s\'est produit à cause de la façon dont j\'ai agi.', o:[['Totalement faux',1],['Très faux',2],['Légèrement faux',3],['Neutre',4],['Légèrement vrai',5],['Très vrai',6],['Totalement vrai',7]] },
+      { q:'L\'événement s\'est produit à cause du type de personne que je suis.', o:[['Totalement faux',1],['Très faux',2],['Légèrement faux',3],['Neutre',4],['Légèrement vrai',5],['Très vrai',6],['Totalement vrai',7]] },
+      { q:'J\'aurais pu empêcher ce qui s\'est passé.', o:[['Totalement faux',1],['Très faux',2],['Légèrement faux',3],['Neutre',4],['Légèrement vrai',5],['Très vrai',6],['Totalement vrai',7]] }
+    ],
+    score(items){
+      const total = Object.values(items).reduce((a,b)=>a+b,0);
+      const moy = (total / 9).toFixed(1);
+      let interp,cls,txt;
+      if(total <= 18){ interp='cognitions adaptées'; cls='ok'; txt='Score bas. Cognitions globalement adaptées. Maintenir la stabilité acquise.'; }
+      else if(total <= 36){ interp='cognitions modérément négatives'; cls='info'; txt='Cognitions négatives modérées. Cible thérapeutique CPT : identifier les "stuck points" prédominants (soi/monde/auto-accusation), restructuration par questionnement socratique. À réévaluer toutes les 3-4 séances.'; }
+      else if(total <= 54){ interp='cognitions négatives marquées'; cls='warn'; txt='Cognitions négatives marquées. Travail CPT indiqué sur l\'ensemble des 3 dimensions. Worksheets ABC + remise en question des croyances dysfonctionnelles. EMDR peut compléter avec ciblage spécifique sur les croyances.'; }
+      else { interp='cognitions sévèrement négatives'; cls='alert'; txt='Cognitions sévèrement négatives. Indication forte CPT/EMDR. Risque de chronicisation des symptômes ESPT si non traité. Évaluer dépression associée (PHQ-9), idéations suicidaires.'; }
+      return { total, max:63, interpretation:interp, message:txt+' (moyenne item : '+moy+'/7)', cls };
+    }
+  },
+  'IES-R':{
+    nom:'IES-R', titre:'IES-R — Impact d\'un événement (révisée)',
+    sub:'Impact of Event Scale-Revised (Weiss & Marmar 1997) · 13 items abrégés · 7 derniers jours',
+    intro:'Évalue la détresse subjective liée à un événement traumatique spécifique sur 7 jours, en 3 dimensions : intrusions, évitement, hypervigilance. Version abrégée pour démo. Score total ≥ 22 suggère une symptomatologie post-traumatique cliniquement significative.',
+    items:[
+      { q:'INTRUSION — Tout rappel ramenait mes sentiments à propos de l\'événement', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Extrêmement',4]] },
+      { q:'INTRUSION — Des images de l\'événement surgissaient malgré moi', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Extrêmement',4]] },
+      { q:'INTRUSION — J\'avais des rêves ou cauchemars à ce sujet', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Extrêmement',4]] },
+      { q:'INTRUSION — J\'avais le sentiment de revivre l\'événement', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Extrêmement',4]] },
+      { q:'INTRUSION — J\'ai eu des réactions physiques fortes en y pensant', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Extrêmement',4]] },
+      { q:'ÉVITEMENT — J\'évitais de me laisser bouleverser quand j\'y pensais', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Extrêmement',4]] },
+      { q:'ÉVITEMENT — J\'ai essayé de l\'effacer de ma mémoire', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Extrêmement',4]] },
+      { q:'ÉVITEMENT — J\'évitais activement d\'en parler ou d\'y penser', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Extrêmement',4]] },
+      { q:'ÉVITEMENT — Mes sentiments à ce sujet étaient comme engourdis', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Extrêmement',4]] },
+      { q:'HYPERVIGILANCE — J\'étais irritable ou en colère', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Extrêmement',4]] },
+      { q:'HYPERVIGILANCE — Je sursautais facilement', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Extrêmement',4]] },
+      { q:'HYPERVIGILANCE — Je me sentais en alerte, sur mes gardes', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Extrêmement',4]] },
+      { q:'HYPERVIGILANCE — J\'avais des difficultés de concentration', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Extrêmement',4]] }
+    ],
+    score(items){
+      const total = Object.values(items).reduce((a,b)=>a+b,0);
+      const intrusion = (items[0]||0)+(items[1]||0)+(items[2]||0)+(items[3]||0)+(items[4]||0);
+      const evitement = (items[5]||0)+(items[6]||0)+(items[7]||0)+(items[8]||0);
+      const hyperv = (items[9]||0)+(items[10]||0)+(items[11]||0)+(items[12]||0);
+      let interp,cls,txt;
+      if(total < 13){ interp='infra-clinique'; cls='ok'; txt='Détresse minime à modérée liée à l\'événement.'; }
+      else if(total < 22){ interp='symptomatologie partielle'; cls='info'; txt='Symptômes post-traumatiques présents sans atteindre le seuil clinique habituel. Suivre l\'évolution.'; }
+      else if(total < 37){ interp='symptomatologie ESPT probable'; cls='warn'; txt='Symptomatologie ESPT cliniquement significative. Indication psychothérapie traumafocale (EMDR ou TCC-CT) en première intention HAS.'; }
+      else { interp='symptomatologie ESPT sévère'; cls='alert'; txt='ESPT sévère. Prise en charge prioritaire. Évaluer comorbidités, idéations suicidaires, dissociation (DES-T).'; }
+      return { total, max:52, interpretation:interp, message:txt+' Sous-scores : Intrusion '+intrusion+'/20 · Évitement '+evitement+'/16 · Hypervigilance '+hyperv+'/16.', cls };
+    }
+  },
+  'ITQ':{
+    nom:'ITQ', titre:'ITQ — PTSD & TSPT-Complexe (CIM-11)',
+    sub:'International Trauma Questionnaire (Cloitre 2018) · 18 items · diagnostic CIM-11',
+    intro:'Auto-questionnaire bref pour distinguer PTSD et TSPT-Complexe selon la CIM-11. 12 items de symptômes (6 PTSD + 6 perturbations de l\'organisation du soi/DSO : dérégulation affective, concept de soi négatif, troubles relationnels) et 6 items de retentissement. Pertinent dans les violences conjugales prolongées (trauma complexe). Score chaque cluster ≥2/8 + retentissement ≥2 pour franchir le seuil.',
+    items:[
+      { q:'PTSD-Reviviscences — Cauchemars sur l\'événement', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Extrêmement',4]] },
+      { q:'PTSD-Reviviscences — Sentiment de revivre l\'événement (flashbacks)', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Extrêmement',4]] },
+      { q:'PTSD-Évitement — J\'évite les pensées et souvenirs internes', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Extrêmement',4]] },
+      { q:'PTSD-Évitement — J\'évite les rappels externes (lieux, personnes)', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Extrêmement',4]] },
+      { q:'PTSD-Hypervigilance — Hyper-attentive au danger', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Extrêmement',4]] },
+      { q:'PTSD-Hypervigilance — Sursauts au moindre bruit', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Extrêmement',4]] },
+      { q:'PTSD-Retentissement — Sur la vie sociale', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Extrêmement',4]] },
+      { q:'PTSD-Retentissement — Sur le travail/études', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Extrêmement',4]] },
+      { q:'PTSD-Retentissement — Sur d\'autres domaines importants', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Extrêmement',4]] },
+      { q:'DSO-Dérégulation affective — Je suis longue à me calmer après être bouleversée', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Extrêmement',4]] },
+      { q:'DSO-Dérégulation affective — Je me sens émotionnellement engourdie', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Extrêmement',4]] },
+      { q:'DSO-Concept de soi — Je me sens un échec', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Extrêmement',4]] },
+      { q:'DSO-Concept de soi — Je me sens sans valeur', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Extrêmement',4]] },
+      { q:'DSO-Relations — Difficulté à me sentir proche des autres', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Extrêmement',4]] },
+      { q:'DSO-Relations — J\'évite les relations parce que c\'est trop difficile', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Extrêmement',4]] },
+      { q:'DSO-Retentissement — Sur la vie sociale', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Extrêmement',4]] },
+      { q:'DSO-Retentissement — Sur le travail/études', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Extrêmement',4]] },
+      { q:'DSO-Retentissement — Sur d\'autres domaines importants', o:[['Pas du tout',0],['Un peu',1],['Modérément',2],['Beaucoup',3],['Extrêmement',4]] }
+    ],
+    score(items){
+      const total = Object.values(items).reduce((a,b)=>a+b,0);
+      // Évaluation des clusters CIM-11 (au moins 1 item ≥2 par cluster, + retentissement ≥2)
+      const cluster = (i1,i2) => Math.max(items[i1]||0, items[i2]||0) >= 2;
+      const reviv = cluster(0,1), evit = cluster(2,3), hyper = cluster(4,5);
+      const retPTSD = Math.max(items[6]||0, items[7]||0, items[8]||0) >= 2;
+      const dereg = cluster(9,10), concept = cluster(11,12), relat = cluster(13,14);
+      const retDSO = Math.max(items[15]||0, items[16]||0, items[17]||0) >= 2;
+      const ptsd = reviv && evit && hyper && retPTSD;
+      const cptsd = ptsd && dereg && concept && relat && retDSO;
+      let interp,cls,txt;
+      if(cptsd){ interp='TSPT-Complexe probable (CIM-11)'; cls='alert'; txt='Critères CIM-11 du TSPT-Complexe remplis (PTSD + DSO). Indication d\'une approche phase-based : stabilisation prolongée, retraitement progressif (EMDR adapté ou TCC-CT), réintégration. Vigilance dissociation (DES-T).'; }
+      else if(ptsd){ interp='PTSD probable (CIM-11)'; cls='warn'; txt='Critères CIM-11 du PTSD remplis. Indication psychothérapie traumafocale en première intention (EMDR, TCC-CT, CPT).'; }
+      else { interp='sous le seuil diagnostique'; cls='ok'; txt='Symptômes présents mais critères CIM-11 non remplis. Surveillance, soutien.'; }
+      const subs = `PTSD : ${reviv?'✓':'·'} reviviscences · ${evit?'✓':'·'} évitement · ${hyper?'✓':'·'} hypervigilance · ${retPTSD?'✓':'·'} retentissement. DSO : ${dereg?'✓':'·'} dérégulation · ${concept?'✓':'·'} concept de soi · ${relat?'✓':'·'} relations · ${retDSO?'✓':'·'} retentissement.`;
+      return { total, max:72, interpretation:interp, message:txt+' '+subs, cls };
+    }
+  },
+  'DES-T':{
+    nom:'DES-T', titre:'DES-T — Taxon dissociatif',
+    sub:'Dissociative Experiences Scale, items "Taxon" (Waller 1996) · 8 items · dissociation pathologique',
+    intro:'Sous-échelle de la DES (Carlson & Putnam) ciblant les expériences dissociatives pathologiques. Score moyen ≥20 évoque un trouble dissociatif. Pertinent avant EMDR (phase 2 prolongée si DES-T élevé) et dans le bilan du TSPT-Complexe. Version paraphrasée pour démo.',
+    items:[
+      { q:'Vous trouver soudain dans un lieu sans souvenir d\'y être allée.', o:[['0%',0],['10%',10],['20%',20],['30%',30],['40%',40],['50%',50],['60%',60],['70%',70],['80%',80],['90%',90],['100%',100]] },
+      { q:'Découvrir des écrits ou objets que vous avez faits sans vous en souvenir.', o:[['0%',0],['10%',10],['20%',20],['30%',30],['40%',40],['50%',50],['60%',60],['70%',70],['80%',80],['90%',90],['100%',100]] },
+      { q:'Avoir le sentiment que votre corps n\'est pas le vôtre.', o:[['0%',0],['10%',10],['20%',20],['30%',30],['40%',40],['50%',50],['60%',60],['70%',70],['80%',80],['90%',90],['100%',100]] },
+      { q:'Vous regarder dans le miroir et ne pas vous reconnaître.', o:[['0%',0],['10%',10],['20%',20],['30%',30],['40%',40],['50%',50],['60%',60],['70%',70],['80%',80],['90%',90],['100%',100]] },
+      { q:'Avoir l\'impression que des personnes/objets/le monde sont irréels.', o:[['0%',0],['10%',10],['20%',20],['30%',30],['40%',40],['50%',50],['60%',60],['70%',70],['80%',80],['90%',90],['100%',100]] },
+      { q:'Avoir l\'impression que des proches ne sont pas réels.', o:[['0%',0],['10%',10],['20%',20],['30%',30],['40%',40],['50%',50],['60%',60],['70%',70],['80%',80],['90%',90],['100%',100]] },
+      { q:'Entendre des voix dans votre tête vous parlant ou commentant vos actes.', o:[['0%',0],['10%',10],['20%',20],['30%',30],['40%',40],['50%',50],['60%',60],['70%',70],['80%',80],['90%',90],['100%',100]] },
+      { q:'Vous sentir comme deux personnes différentes, agissant comme si vous étiez deux personnes différentes.', o:[['0%',0],['10%',10],['20%',20],['30%',30],['40%',40],['50%',50],['60%',60],['70%',70],['80%',80],['90%',90],['100%',100]] }
+    ],
+    score(items){
+      const total = Object.values(items).reduce((a,b)=>a+b,0);
+      const moy = (total / 8).toFixed(1);
+      let interp,cls,txt;
+      if(moy < 10){ interp='dissociation normative'; cls='ok'; txt='Expériences dissociatives dans la norme.'; }
+      else if(moy < 20){ interp='dissociation modérée'; cls='info'; txt='Dissociation modérée. À considérer dans la prise en charge — phase de stabilisation EMDR adaptée. Psychoéducation sur la dissociation.'; }
+      else if(moy < 30){ interp='dissociation significative'; cls='warn'; txt='Niveau évocateur d\'un trouble dissociatif. Approfondir par entretien clinique structuré (SCID-D). EMDR : phase 2 prolongée, approche progressive (Gonzalez & Mosquera).'; }
+      else { interp='dissociation sévère — trouble probable'; cls='alert'; txt='Trouble dissociatif probable (TDI ou ATDS). Bilan spécialisé requis. Avant EMDR ou exposition : travail de stabilisation prolongé impératif, approche par parties (Van der Hart, Nijenhuis, Steele).'; }
+      return { total, max:800, interpretation:interp, message:txt+' Score moyen : '+moy+'/100.', cls };
+    }
+  }
+};
+
+/* ============================================================
+   Sortie rapide
+   ============================================================ */
+
+function sortieRapide(){
+  window.location.replace('https://www.google.com/search?q=météo+lille');
+}
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape') sortieRapide();
+});
+
+/* ============================================================
+   Toast + Modal
+   ============================================================ */
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2400);
+}
+
+function openModal(title, body, footHTML){
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = body;
+  document.getElementById('modal-foot').innerHTML = footHTML || '<button class="btn btn-secondary" onclick="closeModal()">Fermer</button>';
+  document.getElementById('modal').classList.add('show');
+}
+function closeModal(){ document.getElementById('modal').classList.remove('show'); }
+document.getElementById('modal').addEventListener('click', e => {
+  if(e.target.id === 'modal') closeModal();
+});
+
+/* ============================================================
+   Routage simple hash-based
+   ============================================================ */
+
+function route(){
+  const hash = window.location.hash.slice(1) || '/';
+  const parts = hash.split('/').filter(Boolean);
+  const app = document.getElementById('app');
+
+  if(parts.length === 0) return renderHome();
+  if(parts[0] === 'p'){
+    if(parts.length === 1) return renderPraticienListe();
+    const id = parts[1];
+    if(parts[2] === 'echelle') return renderPassationEchelle(id, parts[3]);
+    if(parts[2] === 'cmi') return renderCMI(id);
+    return renderFichePatiente(id, parts[2] || 'synthese');
+  }
+  if(parts[0] === 'u'){
+    return renderPatiente(parts[1] || 'accueil');
+  }
+  renderHome();
+}
+window.addEventListener('hashchange', route);
+function go(path){ window.location.hash = path; }
+
+/* ============================================================
+   Page : Accueil
+   ============================================================ */
+
+function renderHome(){
+  document.getElementById('app').innerHTML = `
+    <div class="home">
+      <div class="home-logo">AÏA<span class="dot">.</span></div>
+      <div class="home-tag">L'appui clinique pour les femmes qui se relèvent.</div>
+      <p class="home-sub">
+        Prototype interactif. Permet d'évaluer la pertinence clinique d'une plateforme combinant repérage, suivi longitudinal et accompagnement, dans le cadre des violences faites aux femmes et du psychotrauma.
+      </p>
+      <div class="home-cards">
+        <div class="home-card prat" onclick="go('/p')">
+          <div class="icon">⚕</div>
+          <h2>Côté praticien</h2>
+          <p>Dossier patiente, passation d'échelles validées (WAST, DA, PCL-5, PHQ-9, GAD-7), courbes longitudinales, rédaction de CMI guidée HAS, notes de séance.</p>
+          <span class="go">Accéder → </span>
+        </div>
+        <div class="home-card pat" onclick="go('/u')">
+          <div class="icon">✿</div>
+          <h2>Côté patiente</h2>
+          <p>Journal sécurisé, auto-évaluation, ancrage 5-4-3-2-1, cohérence cardiaque, plan de sécurité personnel, accès rapide aux numéros d'urgence.</p>
+          <span class="go">Accéder → </span>
+        </div>
+      </div>
+      <p class="home-foot">
+        <strong>Prototype.</strong> Données stockées localement sur cet appareil (localStorage). Aucune donnée envoyée. La touche <span class="kbd" style="font-family:'JetBrains Mono',monospace;background:var(--paper-2);padding:1px 6px;border-radius:4px">Échap</span> redirige vers une page neutre.
+        <br><br>
+        <strong>Échelles présentées</strong> : versions paraphrasées pour démonstration. Production = versions officielles validées (BEH 2021, Campbell 2009, DSM-5, Kroenke 2001, Spitzer 2006).
+      </p>
+    </div>
+  `;
+}
+
+/* ============================================================
+   Page : Praticien — Liste
+   ============================================================ */
+
+function renderPraticienListe(){
+  const last = state.patientes[state.patientes.length - 1];
+  if(state.patientes.length === 0){
+    document.getElementById('app').innerHTML = `
+      <div class="app">${sidebarHTML(null)}
+      <div class="main">
+        <div class="main-head">
+          <div><div class="crumbs">Espace praticien</div><h1>Aucune patiente</h1></div>
+        </div>
+        <div class="main-body">
+          <div class="empty"><div class="em-ic">⚕</div><div class="em-t">Aucune patiente dans le dossier</div><div class="em-s">Ajoutez votre première patiente pour commencer.</div></div>
+          <div style="text-align:center;margin-top:16px"><button class="btn btn-primary" onclick="nouvellePatiente()">+ Nouvelle patiente</button></div>
+        </div>
+      </div></div>`;
+    return;
+  }
+  go('/p/' + (last ? last.id : ''));
+}
+
+function sidebarHTML(activeId){
+  return `
+    <div class="sidebar">
+      <div class="sidebar-head">
+        <div class="logo">AÏA<span class="dot">.</span></div>
+        <div class="role">Espace praticien</div>
+      </div>
+      <div class="sidebar-search"><input type="text" placeholder="Rechercher une patiente…" oninput="filtrerPatientes(this.value)"></div>
+      <div class="sidebar-list" id="sidebar-list">
+        ${state.patientes.map(p => {
+          const lastEch = (p.echelles || []).slice(-1)[0];
+          const alert = lastEch && (lastEch.interpretation === 'sévère' || lastEch.interpretation === 'élevé');
+          return `<div class="sidebar-item ${p.id === activeId ? 'active' : ''}" onclick="go('/p/${p.id}')">
+            <div class="avatar">${(p.prenom[0] || '?').toUpperCase()}</div>
+            <div class="info"><div class="name">${p.prenom} ${p.nom_initial}</div><div class="meta">${p.age} ans · ${p.echelles.length} éval.</div></div>
+            ${alert ? '<div class="badge"></div>' : ''}
+          </div>`;
+        }).join('')}
+      </div>
+      <div class="sidebar-foot"><button class="btn-add" onclick="nouvellePatiente()">+ Nouvelle patiente</button></div>
+    </div>
+  `;
+}
+
+function filtrerPatientes(q){
+  q = q.toLowerCase();
+  const items = document.querySelectorAll('#sidebar-list .sidebar-item');
+  items.forEach(it => {
+    const txt = it.textContent.toLowerCase();
+    it.style.display = txt.includes(q) ? '' : 'none';
+  });
+}
+
+function nouvellePatiente(){
+  openModal('Nouvelle patiente', `
+    <div class="cmi-form">
+      <div class="field"><label>Prénom</label><input type="text" id="np-prenom" placeholder="Prénom"></div>
+      <div class="field"><label>Initiale du nom</label><input type="text" id="np-nom" placeholder="ex : M." maxlength="4"></div>
+      <div class="field"><label>Âge</label><input type="text" id="np-age" placeholder="ex : 34" maxlength="3"></div>
+      <div class="field"><label>Date du premier contact</label><input type="date" id="np-date" value="${new Date().toISOString().slice(0,10)}"></div>
+    </div>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">Annuler</button><button class="btn btn-primary" onclick="creerPatiente()">Créer le dossier</button>`);
+}
+
+function creerPatiente(){
+  const prenom = document.getElementById('np-prenom').value.trim();
+  const nom = document.getElementById('np-nom').value.trim();
+  const age = parseInt(document.getElementById('np-age').value) || 0;
+  const date = document.getElementById('np-date').value;
+  if(!prenom){ toast('Prénom requis'); return; }
+  const p = {
+    id: uuid(), prenom, nom_initial:nom || '', age,
+    premier_contact: date,
+    notes:[], echelles:[],
+    plan_securite:{ signaux:'', strategies:'', contacts_surs:'', lieux_surs:'', objets:'', professionnels:'', code:'', depart:'' },
+    cmi:[]
+  };
+  state.patientes.push(p);
+  saveState();
+  closeModal();
+  toast('Dossier créé');
+  go('/p/' + p.id);
+}
+
+/* ============================================================
+   Page : Fiche patiente (avec onglets)
+   ============================================================ */
+
+function renderFichePatiente(id, tab){
+  const p = state.patientes.find(x => x.id === id);
+  if(!p){ go('/p'); return; }
+
+  const lastEch = nom => (p.echelles || []).filter(e => e.nom === nom).slice(-1)[0];
+  const wast = lastEch('WAST'), da = lastEch('DA'), pcl = lastEch('PCL-5'), phq = lastEch('PHQ-9');
+
+  let body = '';
+  if(tab === 'synthese'){
+    body = synthHTML(p, wast, da, pcl, phq);
+  } else if(tab === 'echelles'){
+    body = echellesHTML(p);
+  } else if(tab === 'emdr'){
+    body = emdrHTML(p);
+  } else if(tab === 'tcc'){
+    body = tccHTML(p);
+  } else if(tab === 'notes'){
+    body = notesHTML(p);
+  } else if(tab === 'plan'){
+    body = planHTML(p);
+  } else if(tab === 'cmi'){
+    body = cmiListHTML(p);
+  }
+
+  document.getElementById('app').innerHTML = `
+    <div class="app">
+      ${sidebarHTML(p.id)}
+      <div class="main">
+        <div class="main-head">
+          <div>
+            <div class="crumbs">Patientes › ${p.prenom} ${p.nom_initial}</div>
+            <h1>${p.prenom} ${p.nom_initial} <span style="font-family:'Inter',sans-serif;font-size:14px;color:var(--ink-3);font-weight:400">· ${p.age} ans · suivie depuis ${formatDate(p.premier_contact)}</span></h1>
+          </div>
+          <div class="h-actions">
+            <button class="btn btn-secondary" onclick="ouvrirNouvelleEchelle('${p.id}')">+ Évaluation</button>
+            <button class="btn btn-primary" onclick="ouvrirNouvelleNote('${p.id}')">+ Note</button>
+          </div>
+        </div>
+        <div class="main-tabs">
+          <div class="main-tab ${tab==='synthese'?'active':''}" onclick="go('/p/${p.id}/synthese')">Synthèse</div>
+          <div class="main-tab ${tab==='echelles'?'active':''}" onclick="go('/p/${p.id}/echelles')">Échelles</div>
+          <div class="main-tab ${tab==='emdr'?'active':''}" onclick="go('/p/${p.id}/emdr')">EMDR</div>
+          <div class="main-tab ${tab==='tcc'?'active':''}" onclick="go('/p/${p.id}/tcc')">TCC</div>
+          <div class="main-tab ${tab==='notes'?'active':''}" onclick="go('/p/${p.id}/notes')">Notes</div>
+          <div class="main-tab ${tab==='plan'?'active':''}" onclick="go('/p/${p.id}/plan')">Plan de sécurité</div>
+          <div class="main-tab ${tab==='cmi'?'active':''}" onclick="go('/p/${p.id}/cmi')">CMI</div>
+        </div>
+        <div class="main-body">${body}</div>
+      </div>
+    </div>
+  `;
+
+  if(tab === 'synthese') renderCharts(p);
+  if(tab === 'emdr') renderEMDRCharts(p);
+  if(tab === 'tcc') renderTCCCharts(p);
+}
+
+function synthHTML(p, wast, da, pcl, phq){
+  const card = (lbl, ech, cls) => {
+    if(!ech) return `<div class="synth-card"><div class="label">${lbl}</div><div class="value" style="color:var(--ink-3);font-size:18px">—</div><div class="sub">Aucune éval.</div></div>`;
+    return `<div class="synth-card ${cls||''}"><div class="label">${lbl}</div><div class="value">${ech.score}<span style="font-size:18px;color:var(--ink-3)">/${ech.max}</span></div><div class="sub">${ech.interpretation} · ${formatDate(ech.date)}</div></div>`;
+  };
+  const cls = e => !e ? '' : (e.interpretation.includes('sévère') || e.interpretation === 'extrême' || e.interpretation === 'élevé' ? 'alert' : (e.interpretation === 'modéré' || e.interpretation === 'accru' || e.interpretation.includes('modéré') ? 'warn' : 'ok'));
+
+  return `
+    <div class="synth-grid">
+      ${card('WAST — violences', wast, cls(wast))}
+      ${card('DA — danger', da, cls(da))}
+      ${card('PCL-5 — ESPT', pcl, cls(pcl))}
+      ${card('PHQ-9 — dépression', phq, cls(phq))}
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h3>Évolution longitudinale</h3>
+        <div class="meta">${p.echelles.length} évaluations</div>
+      </div>
+      <div class="chart-legend" id="chart-legend"></div>
+      <div class="chart-wrap" id="chart-svg"></div>
+    </div>
+
+    <div class="row">
+      <div class="section">
+        <div class="section-head"><h3>Dernières notes</h3><button class="btn btn-ghost btn-sm" onclick="go('/p/${p.id}/notes')">Voir tout →</button></div>
+        ${(p.notes || []).slice(-3).reverse().map(n => `
+          <div class="list-item">
+            <div class="li-main">
+              <div class="li-title">${formatDate(n.date)}</div>
+              <div class="li-sub">${(n.texte || '').slice(0,140)}…</div>
+            </div>
+          </div>
+        `).join('') || '<div class="empty"><div class="em-t">Aucune note pour le moment.</div></div>'}
+      </div>
+      <div class="section">
+        <div class="section-head"><h3>Plan de sécurité</h3><button class="btn btn-ghost btn-sm" onclick="go('/p/${p.id}/plan')">Voir →</button></div>
+        ${planEtatHTML(p)}
+      </div>
+    </div>
+  `;
+}
+
+function planEtatHTML(p){
+  const ps = p.plan_securite || {};
+  const champs = [['signaux','Signaux d\'alerte'],['contacts_surs','Contacts sûrs'],['lieux_surs','Lieux sûrs'],['objets','Sac de départ'],['professionnels','Professionnels'],['code','Code de détresse']];
+  const remplis = champs.filter(([k]) => ps[k] && ps[k].trim().length > 0).length;
+  return `
+    <div style="margin-bottom:12px">
+      <div class="text-xs text-muted mb-1">Plan complété à ${Math.round(remplis/champs.length*100)}%</div>
+      <div style="height:6px;background:var(--paper-2);border-radius:99px;overflow:hidden">
+        <div style="height:100%;background:var(--sage);width:${remplis/champs.length*100}%;transition:width .3s"></div>
+      </div>
+    </div>
+    ${champs.map(([k,lbl]) => `
+      <div style="display:flex;align-items:center;gap:8px;padding:6px 0;font-size:13px">
+        <span style="color:${ps[k] ? 'var(--sage)' : 'var(--ink-3)'};font-size:14px">${ps[k] ? '✓' : '○'}</span>
+        <span style="color:var(--ink-2)">${lbl}</span>
+      </div>
+    `).join('')}
+  `;
+}
+
+function echellesHTML(p){
+  if(!p.echelles || p.echelles.length === 0){
+    return `<div class="section"><div class="empty"><div class="em-ic">📊</div><div class="em-t">Aucune évaluation passée</div><div class="em-s">Cliquez sur "Nouvelle évaluation" pour commencer.</div></div></div>`;
+  }
+  const groupes = {};
+  p.echelles.forEach(e => { if(!groupes[e.nom]) groupes[e.nom]=[]; groupes[e.nom].push(e); });
+
+  return Object.entries(groupes).map(([nom, evals]) => `
+    <div class="section">
+      <div class="section-head"><h3>${nom}</h3><div class="meta">${evals.length} passation${evals.length>1?'s':''}</div></div>
+      ${evals.slice().reverse().map(e => {
+        const cls = e.interpretation.includes('sévère') || e.interpretation === 'élevé' || e.interpretation === 'extrême' ? 'alert' :
+                    (e.interpretation === 'modéré' || e.interpretation === 'accru' || e.interpretation.includes('modéré')) ? 'warn' : 'ok';
+        return `
+        <div class="list-item">
+          <div class="li-main">
+            <div class="li-title">${formatDate(e.date)} · <span class="pill ${cls}">${e.interpretation}</span></div>
+            <div class="li-sub">Score brut</div>
+          </div>
+          <div class="li-score">${e.score}<span style="color:var(--ink-3);font-size:14px">/${e.max}</span></div>
+        </div>
+        `;
+      }).join('')}
+    </div>
+  `).join('');
+}
+
+function notesHTML(p){
+  if(!p.notes || p.notes.length === 0){
+    return `<div class="section"><div class="empty"><div class="em-ic">📝</div><div class="em-t">Aucune note de séance</div><div class="em-s">Ajoutez une note pour démarrer le suivi.</div></div></div>`;
+  }
+  return `<div class="section">${p.notes.slice().reverse().map(n => `
+    <div class="note-item">
+      <div class="n-head"><span>Séance du ${formatDate(n.date)}</span></div>
+      <div class="n-body">${escapeHtml(n.texte)}</div>
+    </div>
+  `).join('')}</div>`;
+}
+
+function planHTML(p){
+  const ps = p.plan_securite || {};
+  const champs = [
+    ['signaux','Signaux d\'alerte (chez moi, chez mon partenaire)', 'Ce qui annonce une montée de tension, une crise.'],
+    ['strategies','Stratégies pendant un épisode','Comment me protéger, où aller, comment réagir.'],
+    ['contacts_surs','Contacts sûrs','Personnes à appeler / message d\'alerte.'],
+    ['lieux_surs','Lieux sûrs','Endroits accessibles 24/7 (proches, professionnels).'],
+    ['objets','Sac de départ','Documents, argent, médicaments, vêtements, etc.'],
+    ['professionnels','Professionnels et associations','3919, avocate, médecin, association locale.'],
+    ['code','Code de détresse','Phrase / mot convenu avec un proche pour signaler le danger.'],
+    ['depart','Préparation à un départ','Ce qui est déjà prêt en cas de besoin de partir.']
+  ];
+  return `
+    <div class="section">
+      <div class="section-head"><h3>Plan de sécurité personnel</h3><div class="meta">Co-construit avec la patiente</div></div>
+      ${champs.map(([k, l, h]) => `
+        <div class="cmi-form" style="margin-bottom:14px">
+          <label>${l}</label>
+          <div class="hint">${h}</div>
+          <textarea oninput="majPlan('${p.id}','${k}',this.value)" rows="3">${ps[k] || ''}</textarea>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function majPlan(id, champ, val){
+  const p = state.patientes.find(x => x.id === id);
+  if(!p) return;
+  if(!p.plan_securite) p.plan_securite = {};
+  p.plan_securite[champ] = val;
+  saveState();
+}
+
+function cmiListHTML(p){
+  return `
+    <div class="section">
+      <div class="section-head">
+        <h3>Certificats médicaux initiaux</h3>
+        <button class="btn btn-primary btn-sm" onclick="go('/p/${p.id}/cmi')">+ Rédiger un CMI</button>
+      </div>
+      ${(p.cmi || []).length === 0 ?
+        '<div class="empty"><div class="em-ic">📄</div><div class="em-t">Aucun CMI rédigé</div><div class="em-s">Le CMI suit la structure HAS 2011.</div></div>'
+        :
+        p.cmi.map((c,i) => `
+          <div class="list-item">
+            <div class="li-main">
+              <div class="li-title">CMI du ${formatDate(c.date)}</div>
+              <div class="li-sub">ITT proposée : ${c.itt} jours</div>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="visualiserCMI('${p.id}',${i})">Visualiser</button>
+          </div>
+        `).join('')
+      }
+    </div>
+  `;
+}
+
+function visualiserCMI(id, i){
+  const p = state.patientes.find(x => x.id === id);
+  const c = p.cmi[i];
+  openModal('CMI du ' + formatDate(c.date), `<div class="cmi-preview">${c.contenu || 'Contenu non disponible.'}</div>`);
+}
+
+/* ============================================================
+   Chart SVG longitudinal
+   ============================================================ */
+
+function renderCharts(p){
+  const wrap = document.getElementById('chart-svg');
+  const leg = document.getElementById('chart-legend');
+  if(!wrap || !p.echelles || p.echelles.length === 0){
+    if(wrap) wrap.innerHTML = '<div class="empty"><div class="em-s">Aucune donnée à afficher.</div></div>';
+    return;
+  }
+
+  // Séries normalisées sur %
+  const groupes = {};
+  p.echelles.forEach(e => {
+    if(!groupes[e.nom]) groupes[e.nom] = [];
+    groupes[e.nom].push({ date: new Date(e.date), pct: (e.score / e.max) * 100, score: e.score, max: e.max });
+  });
+  Object.values(groupes).forEach(arr => arr.sort((a,b) => a.date - b.date));
+
+  const colors = { 'WAST':'#C75B5B', 'DA':'#D89B4A', 'PCL-5':'#3E5C76', 'PHQ-9':'#5C8374', 'GAD-7':'#C9A96E' };
+
+  // SVG dimensions
+  const W = 760, H = 280, mL = 44, mR = 16, mT = 16, mB = 36;
+  const plotW = W - mL - mR, plotH = H - mT - mB;
+
+  // Domaine X
+  const allDates = Object.values(groupes).flat().map(d => d.date);
+  const xMin = Math.min(...allDates), xMax = Math.max(...allDates);
+  const xRange = Math.max(1, xMax - xMin);
+  const xPos = d => mL + ((d - xMin) / xRange) * plotW;
+  const yPos = pct => mT + plotH - (pct / 100) * plotH;
+
+  // Grille horizontale 0 / 25 / 50 / 75 / 100
+  let grid = '';
+  [0,25,50,75,100].forEach(p => {
+    const y = yPos(p);
+    grid += `<line x1="${mL}" y1="${y}" x2="${W-mR}" y2="${y}" stroke="rgba(26,23,20,.08)" stroke-dasharray="3 3"/>`;
+    grid += `<text x="${mL-8}" y="${y+4}" text-anchor="end" font-size="10" fill="#6B6359">${p}%</text>`;
+  });
+
+  // Axe X : 4 graduations dates
+  let xAxis = '';
+  for(let i = 0; i <= 4; i++){
+    const d = new Date(xMin + (xRange * i / 4));
+    const x = mL + plotW * i / 4;
+    xAxis += `<text x="${x}" y="${H-mB+18}" text-anchor="middle" font-size="10" fill="#6B6359">${formatDateShort(d)}</text>`;
+  }
+
+  // Lignes
+  let lines = '';
+  Object.entries(groupes).forEach(([nom, arr]) => {
+    if(arr.length === 0) return;
+    const c = colors[nom] || '#888';
+    const d = arr.map((p,i) => `${i===0?'M':'L'}${xPos(p.date)},${yPos(p.pct)}`).join(' ');
+    lines += `<path d="${d}" fill="none" stroke="${c}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+    arr.forEach(p => {
+      lines += `<circle cx="${xPos(p.date)}" cy="${yPos(p.pct)}" r="4" fill="#fff" stroke="${c}" stroke-width="2"/>`;
+    });
+  });
+
+  wrap.innerHTML = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;max-height:340px">
+    ${grid}${xAxis}${lines}
+  </svg>`;
+
+  leg.innerHTML = Object.keys(groupes).map(nom => `
+    <div class="li"><span class="dot" style="background:${colors[nom]||'#888'}"></span>${nom}</div>
+  `).join('');
+}
+
+/* ============================================================
+   Passation d'une échelle
+   ============================================================ */
+
+/* ============================================================
+   Module EMDR — Plan de ciblage, cibles, séances, courbes
+   ============================================================ */
+
+const EMDR_PHASES = [
+  ['Histoire', 'Anamnèse, plan de ciblage'],
+  ['Préparation', 'Lieu sûr, ressources, signal STOP'],
+  ['Évaluation', 'Image, CN, CP, VOC, SUD, sensation'],
+  ['Désensibilisation', 'SBA, retraitement (SUD→0)'],
+  ['Installation', 'Renforcement CP (VOC→7)'],
+  ['Scanner corporel', 'Vérification sensations'],
+  ['Clôture', 'Retour à un état stable'],
+  ['Réévaluation', 'Contrôle gains entre séances']
+];
+
+const EMDR_CN_CATALOG = {
+  'responsabilite':{
+    label:'Responsabilité (culpabilité / estime)',
+    cn:['Je suis coupable.','J\'aurais dû faire quelque chose.','Je n\'aurais pas dû...','C\'est ma faute.','Je suis nulle.','Je ne vaux rien.','Je suis indigne d\'amour.','Je suis défaillante.'],
+    cp:['J\'ai fait ce que je pouvais.','C\'est lui qui était responsable.','Je suis quelqu\'un de bien.','Je mérite l\'amour.','Je suis suffisante.','Je suis digne.']
+  },
+  'securite':{
+    label:'Sécurité / survie',
+    cn:['Je suis en danger.','Je vais mourir.','Je suis sans défense.','Je ne peux pas me protéger.','Le monde est dangereux.'],
+    cp:['Je suis en sécurité maintenant.','C\'est fini.','Je peux me protéger.','Je suis en vie.','Le danger est passé.']
+  },
+  'choix':{
+    label:'Choix / contrôle',
+    cn:['Je n\'ai pas de choix.','Je suis impuissante.','Je suis piégée.','Je ne contrôle rien.','Je suis sans recours.'],
+    cp:['J\'ai des choix maintenant.','Je peux décider.','Je suis libre.','J\'ai du pouvoir sur ma vie.']
+  }
+};
+
+function emdrHTML(p){
+  if(!p.emdr) p.emdr = { phase_actuelle:1, lieu_sur:'', ressources:[], cibles:[] };
+  const e = p.emdr;
+
+  const phasesHTML = EMDR_PHASES.map((ph,i) => {
+    const num = i+1;
+    const cls = num < e.phase_actuelle ? 'done' : num === e.phase_actuelle ? 'current' : '';
+    return `<div class="emdr-phase ${cls}" onclick="majPhaseEMDR('${p.id}',${num})">
+      <div class="ep-num">${num}</div>
+      <div class="ep-lbl">${ph[0]}<br><span style="font-size:10px;opacity:.7">${ph[1]}</span></div>
+    </div>`;
+  }).join('');
+
+  const ciblesHTML = (e.cibles || []).map(c => {
+    const dernSud = c.seances.length > 0 ? c.seances[c.seances.length-1].sud_fin : c.sud_initial;
+    const dernVoc = c.seances.length > 0 ? c.seances[c.seances.length-1].voc_fin : c.voc_initial;
+    const sudClass = dernSud <= 2 ? 'ok' : dernSud <= 5 ? 'warn' : 'alert';
+    return `
+    <div class="cible">
+      <div class="cible-head">
+        <div>
+          <span class="cible-type ${c.type === 'passé' ? 'passe' : c.type === 'présent' ? 'present' : 'futur'}">${c.type}</span>
+          <span style="margin-left:6px;font-size:11px;color:var(--ink-3)">${c.status}</span>
+        </div>
+        <div style="font-size:11px;color:var(--ink-3)">${c.seances.length} séance${c.seances.length>1?'s':''}</div>
+      </div>
+      <div class="cible-titre">${c.titre}</div>
+      <div style="font-size:12px;color:var(--ink-3);margin-top:4px">${c.image}</div>
+
+      <div class="cible-grid">
+        <div class="cg-item"><div class="cg-lbl">CN (${EMDR_CN_CATALOG[c.cn.categorie]?.label.split(' ')[0] || c.cn.categorie})</div><div class="cg-val">« ${c.cn.texte} »</div></div>
+        <div class="cg-item"><div class="cg-lbl">CP visée</div><div class="cg-val">« ${c.cp.texte} »</div></div>
+        <div class="cg-item"><div class="cg-lbl">Émotion · sensation</div><div class="cg-val">${c.emotion}<br><span style="color:var(--ink-3);font-size:12px">${c.sensation || '—'}</span></div></div>
+      </div>
+
+      <div class="cible-sudvoc">
+        <div class="sv"><div class="sv-lbl">SUD initial</div><div class="sv-val" style="color:var(--alert)">${c.sud_initial}/10</div></div>
+        <div class="sv"><div class="sv-lbl">SUD actuel</div><div class="sv-val" style="color:${dernSud<=2?'var(--sage)':dernSud<=5?'var(--warn)':'var(--alert)'}">${dernSud}/10</div><div class="sv-evo">Δ ${(c.sud_initial - dernSud > 0 ? '−' : '+')+ Math.abs(c.sud_initial - dernSud)}</div></div>
+        <div class="sv"><div class="sv-lbl">VOC initial</div><div class="sv-val" style="color:var(--ink-3)">${c.voc_initial}/7</div></div>
+        <div class="sv"><div class="sv-lbl">VOC actuel</div><div class="sv-val" style="color:var(--sage)">${dernVoc}/7</div><div class="sv-evo">Δ +${dernVoc - c.voc_initial}</div></div>
+      </div>
+
+      ${c.seances.length > 0 ? `<div style="margin-top:14px"><div class="text-xs text-muted mb-1">HISTORIQUE DES SÉANCES</div>
+        ${c.seances.slice().reverse().map(s => `
+        <div class="seance-emdr">
+          <div class="se-head">
+            <div class="se-d">${formatDate(s.date)}</div>
+            <span class="se-stat ${s.complete?'c':'i'}">${s.complete ? 'séance complète' : 'incomplète'}</span>
+          </div>
+          <div class="se-scores">SUD ${s.sud_debut}→${s.sud_fin} · VOC ${s.voc_debut}→${s.voc_fin}${s.sensation_residuelle ? ' · '+s.sensation_residuelle : ''}</div>
+          ${s.notes ? `<div style="margin-top:4px;font-size:12px;color:var(--ink-2)">${escapeHtml(s.notes)}</div>` : ''}
+        </div>`).join('')}
+      </div>` : ''}
+
+      <div class="cible-actions">
+        <button class="btn btn-primary btn-sm" onclick="ouvrirSeanceEMDR('${p.id}','${c.id}')">+ Nouvelle séance</button>
+        <button class="btn btn-ghost btn-sm" onclick="modifierCible('${p.id}','${c.id}')">Modifier</button>
+        ${dernSud <= 1 && dernVoc >= 6 ? `<button class="btn btn-secondary btn-sm" onclick="terminerCible('${p.id}','${c.id}')">Cible traitée ✓</button>` : ''}
+      </div>
+    </div>`;
+  }).join('') || '<div class="empty"><div class="em-ic">○</div><div class="em-t">Aucune cible</div><div class="em-s">Ajoutez une cible pour démarrer le plan de ciblage.</div></div>';
+
+  return `
+    <div class="section">
+      <div class="section-head"><h3>Phases du protocole EMDR</h3><div class="meta">Cliquez pour mettre à jour la phase en cours</div></div>
+      <div class="emdr-phases">${phasesHTML}</div>
+      <p class="text-sm text-muted">Phase actuelle : <strong>Phase ${e.phase_actuelle} — ${EMDR_PHASES[e.phase_actuelle-1][0]}</strong>. ${EMDR_PHASES[e.phase_actuelle-1][1]}.</p>
+    </div>
+
+    <div class="row">
+      <div class="section" style="flex:1;min-width:280px">
+        <div class="section-head"><h3>Lieu sûr</h3><button class="btn btn-ghost btn-sm" onclick="editerLieuSur('${p.id}')">Modifier</button></div>
+        ${e.lieu_sur ? `<p style="font-style:italic;font-family:'Fraunces',serif;line-height:1.65;color:var(--ink-2)">« ${e.lieu_sur} »</p>` : '<div class="empty"><div class="em-s">Pas encore identifié.</div></div>'}
+      </div>
+      <div class="section" style="flex:1;min-width:280px">
+        <div class="section-head"><h3>Ressources internes</h3><button class="btn btn-ghost btn-sm" onclick="editerRessources('${p.id}')">Modifier</button></div>
+        ${(e.ressources || []).length > 0 ? `<ul style="list-style:none;padding:0">${e.ressources.map(r => `<li style="padding:8px 0;border-bottom:1px solid var(--line);font-size:13px;color:var(--ink-2)">${r}</li>`).join('')}</ul>` : '<div class="empty"><div class="em-s">Aucune ressource installée.</div></div>'}
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><h3>Plan de ciblage</h3><button class="btn btn-primary btn-sm" onclick="ouvrirNouvelleCible('${p.id}')">+ Nouvelle cible</button></div>
+      <p class="text-sm text-muted mb-2">Cibles ordonnées passé → présent → futur (modèle TAI). Chaque cible avec SUD ≥ 3 fait l'objet d'un retraitement phases 3-8.</p>
+      ${ciblesHTML}
+    </div>
+
+    ${(e.cibles || []).length > 0 ? `
+    <div class="section">
+      <div class="section-head"><h3>Évolution SUD/VOC par cible</h3><div class="meta">Chaque ligne = une cible</div></div>
+      <div id="emdr-chart"></div>
+    </div>
+    ` : ''}
+  `;
+}
+
+function majPhaseEMDR(patId, phase){
+  const p = state.patientes.find(x => x.id === patId);
+  if(!p.emdr) p.emdr = { phase_actuelle:1, lieu_sur:'', ressources:[], cibles:[] };
+  p.emdr.phase_actuelle = phase;
+  saveState();
+  toast('Phase '+phase+' — '+EMDR_PHASES[phase-1][0]);
+  go('/p/'+patId+'/emdr');
+}
+
+function editerLieuSur(patId){
+  const p = state.patientes.find(x => x.id === patId);
+  openModal('Lieu sûr', `
+    <p class="text-sm text-muted mb-2">Décrivez un lieu, réel ou imaginé, présent ou futur, associé à des sensations de calme, sécurité, bien-être. Sollicitez les 5 sens : ce qu'on voit, entend, sent, touche, ressent dans le corps. Évitez les lieux du passé contaminables par des intrusions.</p>
+    <textarea id="ls-txt" rows="6" style="width:100%;padding:10px;border:1px solid var(--line-strong);border-radius:8px;font-family:inherit">${(p.emdr && p.emdr.lieu_sur) || ''}</textarea>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">Annuler</button><button class="btn btn-primary" onclick="sauverLieuSur('${patId}')">Enregistrer</button>`);
+}
+
+function sauverLieuSur(patId){
+  const p = state.patientes.find(x => x.id === patId);
+  if(!p.emdr) p.emdr = { phase_actuelle:1, lieu_sur:'', ressources:[], cibles:[] };
+  p.emdr.lieu_sur = document.getElementById('ls-txt').value;
+  saveState();
+  closeModal();
+  toast('Lieu sûr enregistré');
+  go('/p/'+patId+'/emdr');
+}
+
+function editerRessources(patId){
+  const p = state.patientes.find(x => x.id === patId);
+  const ress = (p.emdr && p.emdr.ressources) || [];
+  openModal('Ressources internes', `
+    <p class="text-sm text-muted mb-2">Souvenirs, images, personnes, qualités personnelles à installer comme ressources (Leeds 1998). Une ressource par ligne.</p>
+    <textarea id="rs-txt" rows="6" style="width:100%;padding:10px;border:1px solid var(--line-strong);border-radius:8px;font-family:inherit" placeholder="Ex : Souvenir de courage — randonnée GR20 terminée seule, 2019.">${ress.join('\n')}</textarea>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">Annuler</button><button class="btn btn-primary" onclick="sauverRessources('${patId}')">Enregistrer</button>`);
+}
+
+function sauverRessources(patId){
+  const p = state.patientes.find(x => x.id === patId);
+  if(!p.emdr) p.emdr = { phase_actuelle:1, lieu_sur:'', ressources:[], cibles:[] };
+  p.emdr.ressources = document.getElementById('rs-txt').value.split('\n').map(s => s.trim()).filter(Boolean);
+  saveState();
+  closeModal();
+  toast('Ressources enregistrées');
+  go('/p/'+patId+'/emdr');
+}
+
+function ouvrirNouvelleCible(patId){
+  openModal('Nouvelle cible EMDR', `
+    <div class="cmi-form">
+      <div class="field"><label>Type de cible</label>
+        <select id="nc-type" style="width:100%;padding:10px;border:1px solid var(--line-strong);border-radius:8px">
+          <option value="passé">Passé (souvenir traumatique)</option>
+          <option value="présent">Présent (déclencheur actuel)</option>
+          <option value="futur">Futur (anticipation)</option>
+        </select>
+      </div>
+      <div class="field"><label>Titre de la cible</label>
+        <div class="hint">Phrase courte pour identifier l'événement.</div>
+        <input type="text" id="nc-titre" placeholder="ex : Première gifle au mariage de Pauline, 2023">
+      </div>
+      <div class="field"><label>Image / pire moment</label>
+        <div class="hint">Si vous deviez prendre une "photo" du pire moment, que verriez-vous ?</div>
+        <input type="text" id="nc-image" placeholder="ex : Sa main qui revient, le couloir, le silence">
+      </div>
+      <div class="field"><label>Catégorie de cognition négative</label>
+        <select id="nc-cn-cat" onchange="majCNOptions(this.value)" style="width:100%;padding:10px;border:1px solid var(--line-strong);border-radius:8px">
+          <option value="responsabilite">Responsabilité (culpabilité / estime de soi)</option>
+          <option value="securite">Sécurité / survie</option>
+          <option value="choix">Choix / contrôle</option>
+        </select>
+      </div>
+      <div class="field"><label>Cognition négative (CN)</label>
+        <div class="hint">Croyance auto-référencée, au présent, négative.</div>
+        <input type="text" id="nc-cn" placeholder="Je suis coupable. / Je vais mourir. / Je n'ai pas de choix." list="nc-cn-list">
+        <datalist id="nc-cn-list">
+          ${EMDR_CN_CATALOG.responsabilite.cn.map(c => `<option value="${c}">`).join('')}
+        </datalist>
+      </div>
+      <div class="field"><label>Cognition positive visée (CP)</label>
+        <div class="hint">Croyance auto-référencée, au présent, positive, plausible.</div>
+        <input type="text" id="nc-cp" placeholder="J'ai fait ce que je pouvais. / Je suis en sécurité maintenant. / Je peux choisir." list="nc-cp-list">
+        <datalist id="nc-cp-list">
+          ${EMDR_CN_CATALOG.responsabilite.cp.map(c => `<option value="${c}">`).join('')}
+        </datalist>
+      </div>
+      <div class="row">
+        <div class="field" style="flex:1"><label>VOC initial (1-7)</label>
+          <div class="hint">À quel point la CP semble-t-elle vraie ?</div>
+          <input type="number" id="nc-voc" min="1" max="7" value="2">
+        </div>
+        <div class="field" style="flex:1"><label>SUD initial (0-10)</label>
+          <div class="hint">Niveau de perturbation actuel.</div>
+          <input type="number" id="nc-sud" min="0" max="10" value="7">
+        </div>
+      </div>
+      <div class="field"><label>Émotion(s) prédominante(s)</label>
+        <input type="text" id="nc-emo" placeholder="peur, honte, colère, tristesse, etc.">
+      </div>
+      <div class="field"><label>Sensation corporelle</label>
+        <input type="text" id="nc-sens" placeholder="gorge serrée, poitrine, ventre, jambes">
+      </div>
+    </div>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">Annuler</button><button class="btn btn-primary" onclick="creerCible('${patId}')">Ajouter la cible</button>`);
+}
+
+function majCNOptions(cat){
+  const lstCN = document.getElementById('nc-cn-list');
+  const lstCP = document.getElementById('nc-cp-list');
+  if(lstCN) lstCN.innerHTML = EMDR_CN_CATALOG[cat].cn.map(c => `<option value="${c}">`).join('');
+  if(lstCP) lstCP.innerHTML = EMDR_CN_CATALOG[cat].cp.map(c => `<option value="${c}">`).join('');
+}
+
+function creerCible(patId){
+  const p = state.patientes.find(x => x.id === patId);
+  if(!p.emdr) p.emdr = { phase_actuelle:1, lieu_sur:'', ressources:[], cibles:[] };
+  const titre = document.getElementById('nc-titre').value.trim();
+  if(!titre){ toast('Titre requis'); return; }
+  const c = {
+    id:'c'+Date.now(),
+    type:document.getElementById('nc-type').value,
+    titre,
+    image:document.getElementById('nc-image').value,
+    cn:{ texte:document.getElementById('nc-cn').value, categorie:document.getElementById('nc-cn-cat').value },
+    cp:{ texte:document.getElementById('nc-cp').value },
+    voc_initial:parseInt(document.getElementById('nc-voc').value)||2,
+    sud_initial:parseInt(document.getElementById('nc-sud').value)||7,
+    voc_actuel:parseInt(document.getElementById('nc-voc').value)||2,
+    sud_actuel:parseInt(document.getElementById('nc-sud').value)||7,
+    emotion:document.getElementById('nc-emo').value,
+    sensation:document.getElementById('nc-sens').value,
+    status:'à traiter',
+    seances:[]
+  };
+  p.emdr.cibles.push(c);
+  saveState();
+  closeModal();
+  toast('Cible ajoutée');
+  go('/p/'+patId+'/emdr');
+}
+
+function ouvrirSeanceEMDR(patId, cibleId){
+  const p = state.patientes.find(x => x.id === patId);
+  const c = p.emdr.cibles.find(x => x.id === cibleId);
+  const dernSud = c.seances.length > 0 ? c.seances[c.seances.length-1].sud_fin : c.sud_initial;
+  const dernVoc = c.seances.length > 0 ? c.seances[c.seances.length-1].voc_fin : c.voc_initial;
+  openModal('Nouvelle séance EMDR — ' + c.titre, `
+    <p class="text-sm text-muted mb-2">CN : <em>« ${c.cn.texte} »</em><br>CP visée : <em>« ${c.cp.texte} »</em></p>
+    <div class="cmi-form">
+      <div class="field"><label>Date</label><input type="date" id="se-date" value="${new Date().toISOString().slice(0,10)}"></div>
+      <div class="row">
+        <div class="field" style="flex:1"><label>SUD début</label><input type="number" id="se-sd" min="0" max="10" value="${dernSud}"></div>
+        <div class="field" style="flex:1"><label>VOC début</label><input type="number" id="se-vd" min="1" max="7" value="${dernVoc}"></div>
+      </div>
+      <div class="row">
+        <div class="field" style="flex:1"><label>SUD fin</label><input type="number" id="se-sf" min="0" max="10" value="${Math.max(0,dernSud-2)}"></div>
+        <div class="field" style="flex:1"><label>VOC fin</label><input type="number" id="se-vf" min="1" max="7" value="${Math.min(7,dernVoc+1)}"></div>
+      </div>
+      <div class="field"><label>Sensation corporelle résiduelle</label><input type="text" id="se-sens" placeholder="ex : légère tension dans la nuque, apaisement"></div>
+      <div class="field"><label>
+        <input type="checkbox" id="se-comp" style="margin-right:6px"> Séance complète (SUD ≤ 1, VOC ≥ 6, body scan négatif)
+      </label></div>
+      <div class="field"><label>Notes cliniques</label><textarea id="se-notes" rows="4" placeholder="Observations, émergences associatives, axes pour prochaine séance…"></textarea></div>
+    </div>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">Annuler</button><button class="btn btn-primary" onclick="sauverSeanceEMDR('${patId}','${cibleId}')">Enregistrer</button>`);
+}
+
+function sauverSeanceEMDR(patId, cibleId){
+  const p = state.patientes.find(x => x.id === patId);
+  const c = p.emdr.cibles.find(x => x.id === cibleId);
+  const s = {
+    date:document.getElementById('se-date').value,
+    sud_debut:parseInt(document.getElementById('se-sd').value)||0,
+    voc_debut:parseInt(document.getElementById('se-vd').value)||1,
+    sud_fin:parseInt(document.getElementById('se-sf').value)||0,
+    voc_fin:parseInt(document.getElementById('se-vf').value)||1,
+    sensation_residuelle:document.getElementById('se-sens').value,
+    complete:document.getElementById('se-comp').checked,
+    notes:document.getElementById('se-notes').value
+  };
+  c.seances.push(s);
+  c.sud_actuel = s.sud_fin;
+  c.voc_actuel = s.voc_fin;
+  if(c.status === 'à traiter') c.status = 'en cours';
+  saveState();
+  closeModal();
+  toast('Séance enregistrée');
+  go('/p/'+patId+'/emdr');
+}
+
+function terminerCible(patId, cibleId){
+  const p = state.patientes.find(x => x.id === patId);
+  const c = p.emdr.cibles.find(x => x.id === cibleId);
+  c.status = 'terminée';
+  saveState();
+  toast('Cible marquée comme traitée');
+  go('/p/'+patId+'/emdr');
+}
+
+function modifierCible(patId, cibleId){
+  toast('Modification — non implémentée dans cette démo');
+}
+
+function renderEMDRCharts(p){
+  const wrap = document.getElementById('emdr-chart');
+  if(!wrap || !p.emdr || !p.emdr.cibles) return;
+  const cibles = p.emdr.cibles.filter(c => c.seances.length > 0);
+  if(cibles.length === 0){ wrap.innerHTML = '<div class="empty"><div class="em-s">Pas encore de séance enregistrée.</div></div>'; return; }
+
+  const W = 760, H = 240, mL = 40, mR = 16, mT = 16, mB = 32;
+  const plotW = W - mL - mR, plotH = H - mT - mB;
+  const colors = ['#C75B5B','#3E5C76','#5C8374','#C9A96E','#7a3a7a'];
+
+  // X = numéro de séance (0 = initial, 1..n = séances), Y = SUD (0-10)
+  const maxSeances = Math.max(...cibles.map(c => c.seances.length));
+  const xPos = i => mL + (i / Math.max(1, maxSeances)) * plotW;
+  const yPos = sud => mT + plotH - (sud / 10) * plotH;
+
+  let grid = '';
+  [0,2,4,6,8,10].forEach(v => {
+    const y = yPos(v);
+    grid += `<line x1="${mL}" y1="${y}" x2="${W-mR}" y2="${y}" stroke="rgba(26,23,20,.08)" stroke-dasharray="3 3"/>`;
+    grid += `<text x="${mL-6}" y="${y+4}" text-anchor="end" font-size="10" fill="#6B6359">${v}</text>`;
+  });
+
+  let xAxis = '';
+  for(let i = 0; i <= maxSeances; i++){
+    xAxis += `<text x="${xPos(i)}" y="${H-mB+16}" text-anchor="middle" font-size="10" fill="#6B6359">${i===0?'init':'S'+i}</text>`;
+  }
+
+  let lines = '';
+  cibles.forEach((c, idx) => {
+    const col = colors[idx % colors.length];
+    const points = [{ x:0, y:c.sud_initial }, ...c.seances.map((s,i) => ({ x:i+1, y:s.sud_fin }))];
+    const d = points.map((pt,i) => `${i===0?'M':'L'}${xPos(pt.x)},${yPos(pt.y)}`).join(' ');
+    lines += `<path d="${d}" fill="none" stroke="${col}" stroke-width="2.5"/>`;
+    points.forEach(pt => {
+      lines += `<circle cx="${xPos(pt.x)}" cy="${yPos(pt.y)}" r="4" fill="#fff" stroke="${col}" stroke-width="2"/>`;
+    });
+  });
+
+  wrap.innerHTML = `
+    <div class="chart-legend">
+      ${cibles.map((c,i) => `<div class="li"><span class="dot" style="background:${colors[i%colors.length]}"></span>${c.titre.slice(0,40)}${c.titre.length>40?'…':''}</div>`).join('')}
+    </div>
+    <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;max-height:280px">
+      ${grid}${xAxis}${lines}
+      <text x="${mL-30}" y="${mT+plotH/2}" text-anchor="middle" font-size="10" fill="#6B6359" transform="rotate(-90 ${mL-30} ${mT+plotH/2})">SUD (0-10)</text>
+    </svg>
+  `;
+}
+
+/* ============================================================
+   Module TCC — Beck, stuck points, hiérarchie d'exposition
+   ============================================================ */
+
+const SP_THEMES = {
+  'securite':'Sécurité',
+  'confiance':'Confiance',
+  'pouvoir':'Pouvoir / Contrôle',
+  'estime':'Estime de soi',
+  'intimite':'Intimité'
+};
+
+function tccHTML(p){
+  if(!p.tcc) p.tcc = { approche:'', impact_statement:'', stuck_points:[], beck_table:[], hierarchie:[] };
+  const t = p.tcc;
+
+  return `
+    <div class="section">
+      <div class="section-head">
+        <h3>Approche & Impact Statement</h3>
+        <button class="btn btn-ghost btn-sm" onclick="editerImpactStatement('${p.id}')">Modifier</button>
+      </div>
+      <p class="text-sm text-muted">Approche utilisée : <strong>${t.approche || '—'}</strong></p>
+      ${t.impact_statement ? `
+        <div style="margin-top:12px;padding:16px 20px;background:var(--paper-2);border-left:3px solid var(--or);border-radius:0 8px 8px 0;font-family:'Fraunces',serif;font-style:italic;line-height:1.7;color:var(--ink-2)">
+          ${escapeHtml(t.impact_statement)}
+        </div>
+        <p class="text-xs text-muted mt-2">Impact Statement (CPT) : « Pourquoi pensez-vous que cet événement vous est arrivé, et qu'est-ce que cela vous fait penser de vous, des autres, du monde ? »</p>
+      ` : '<div class="empty"><div class="em-s">Impact Statement non encore rédigé.</div></div>'}
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h3>Stuck Points (croyances bloquantes — CPT)</h3>
+        <button class="btn btn-primary btn-sm" onclick="ouvrirNouveauStuckPoint('${p.id}')">+ Stuck Point</button>
+      </div>
+      <p class="text-sm text-muted mb-2">Croyances dysfonctionnelles à challenger par questionnement socratique. Force de croyance 0-100. 5 thèmes : Sécurité, Confiance, Pouvoir/Contrôle, Estime, Intimité.</p>
+
+      ${(t.stuck_points || []).length === 0 ? '<div class="empty"><div class="em-s">Aucun stuck point identifié.</div></div>' : t.stuck_points.map(sp => `
+        <div class="sp-card">
+          <div class="sp-head">
+            <span class="sp-theme ${sp.theme}">${SP_THEMES[sp.theme] || sp.theme}</span>
+            <div style="display:flex;gap:6px">
+              <button class="btn btn-ghost btn-sm" onclick="majStuckPoint('${p.id}','${sp.id}')">Réévaluer</button>
+            </div>
+          </div>
+          <div class="sp-texte">« ${sp.texte} »</div>
+          <div class="sp-bar">
+            <div class="sp-bar-fill" style="width:${sp.force_actuelle}%"></div>
+            <div class="sp-bar-init" style="left:${sp.force_initiale}%"></div>
+          </div>
+          <div class="sp-meta">
+            <span>force initiale : ${sp.force_initiale}%</span>
+            <span>actuelle : <strong>${sp.force_actuelle}%</strong> ${sp.force_actuelle < sp.force_initiale ? '↓ '+(sp.force_initiale-sp.force_actuelle) : ''}</span>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h3>Tableau de Beck — Restructuration cognitive</h3>
+        <button class="btn btn-primary btn-sm" onclick="ouvrirNouveauBeck('${p.id}')">+ Nouvelle entrée</button>
+      </div>
+      <p class="text-sm text-muted mb-2">Situation → Émotion → Pensée automatique → Pensée alternative → Ré-évaluation. Modèle Beck à 5 colonnes.</p>
+
+      ${(t.beck_table || []).length === 0 ? '<div class="empty"><div class="em-s">Aucune entrée pour le moment.</div></div>' : t.beck_table.slice().reverse().map(b => `
+        <div class="beck-row">
+          <div class="br-date">${formatDate(b.date)}</div>
+          <div class="beck-cell" style="margin-bottom:10px">
+            <div class="bc-lbl">Situation</div>
+            <div class="bc-txt">${escapeHtml(b.situation)}</div>
+          </div>
+          <div class="beck-grid">
+            <div class="beck-cell before">
+              <div class="bc-lbl">Émotion · intensité</div>
+              <div class="bc-txt">${escapeHtml(b.emotion)}</div>
+              <div class="bc-bar"><div class="bc-bar-fill" style="width:${b.intensite_emo}%"></div></div>
+              <div class="text-xs text-muted" style="margin-top:2px">${b.intensite_emo}/100</div>
+            </div>
+            <div class="beck-cell before">
+              <div class="bc-lbl">Pensée automatique</div>
+              <div class="bc-txt">« ${escapeHtml(b.pensee_auto)} »</div>
+              <div class="bc-bar"><div class="bc-bar-fill" style="width:${b.croyance_pa}%"></div></div>
+              <div class="text-xs text-muted" style="margin-top:2px">croyance ${b.croyance_pa}/100</div>
+            </div>
+            <div class="beck-cell after">
+              <div class="bc-lbl">Pensée alternative</div>
+              <div class="bc-txt">${escapeHtml(b.pensee_alt)}</div>
+              <div class="bc-bar"><div class="bc-bar-fill" style="width:${b.croyance_alt}%"></div></div>
+              <div class="text-xs text-muted" style="margin-top:2px">croyance ${b.croyance_alt}/100</div>
+            </div>
+          </div>
+          <div class="beck-arrow">↓ ré-évaluation émotion : <strong>${b.reeval_emo}/100</strong> (Δ ${b.intensite_emo - b.reeval_emo > 0 ? '−' : '+'}${Math.abs(b.intensite_emo - b.reeval_emo)})</div>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h3>Hiérarchie d'exposition (PE)</h3>
+        <button class="btn btn-primary btn-sm" onclick="ouvrirNouvelleExpo('${p.id}')">+ Situation</button>
+      </div>
+      <p class="text-sm text-muted mb-2">Situations sécuritaires mais évitées (Foa 1989). SUDS 0-100. Exposition graduée jusqu'à habituation (réduction de moitié).</p>
+
+      ${(t.hierarchie || []).length === 0 ? '<div class="empty"><div class="em-s">Aucune hiérarchie construite.</div></div>' : t.hierarchie.slice().sort((a,b)=>b.suds_actuel-a.suds_actuel).map(h => `
+        <div class="expo-item ${h.complete?'complete':''}">
+          <div class="ei-head">
+            <div class="ei-titre">${escapeHtml(h.situation)}</div>
+            ${h.complete ? '<span class="pill ok">✓ habituée</span>' : `<button class="btn btn-ghost btn-sm" onclick="majExpo('${p.id}','${h.id}')">Mettre à jour SUDS</button>`}
+          </div>
+          <div class="ei-suds">
+            <div class="ei-sud init"><div class="ei-sud-lbl">SUDS initial</div><div class="ei-sud-val">${h.suds_initial}</div></div>
+            <span class="expo-arrow">→</span>
+            <div class="ei-sud curr"><div class="ei-sud-lbl">SUDS actuel</div><div class="ei-sud-val">${h.suds_actuel}</div></div>
+            <span class="expo-arrow">→</span>
+            <div class="ei-sud obj"><div class="ei-sud-lbl">Objectif</div><div class="ei-sud-val">${h.suds_objectif}</div></div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+
+    ${(t.stuck_points || []).length > 0 ? `
+    <div class="section">
+      <div class="section-head"><h3>Évolution des stuck points</h3><div class="meta">Force de croyance dans le temps</div></div>
+      <div id="tcc-chart"></div>
+    </div>
+    ` : ''}
+  `;
+}
+
+function editerImpactStatement(patId){
+  const p = state.patientes.find(x => x.id === patId);
+  if(!p.tcc) p.tcc = { approche:'', impact_statement:'', stuck_points:[], beck_table:[], hierarchie:[] };
+  openModal('Impact Statement & approche', `
+    <p class="text-sm text-muted mb-2">CPT (Resick) — séance 1 : la patiente écrit ce que signifie pour elle l'événement, et l'impact sur ses croyances sur soi, les autres, le monde.</p>
+    <div class="cmi-form">
+      <div class="field"><label>Approche thérapeutique</label>
+        <input type="text" id="is-app" value="${p.tcc.approche || ''}" placeholder="ex : CPT, PE, TCC-CT, intégrative">
+      </div>
+      <div class="field"><label>Impact Statement</label>
+        <textarea id="is-txt" rows="8" placeholder="« Je pense que cet événement m'est arrivé parce que... Cela me fait penser de moi que... Cela me fait penser des autres que... Cela me fait penser du monde que... »">${p.tcc.impact_statement || ''}</textarea>
+      </div>
+    </div>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">Annuler</button><button class="btn btn-primary" onclick="sauverImpactStatement('${patId}')">Enregistrer</button>`);
+}
+
+function sauverImpactStatement(patId){
+  const p = state.patientes.find(x => x.id === patId);
+  p.tcc.approche = document.getElementById('is-app').value;
+  p.tcc.impact_statement = document.getElementById('is-txt').value;
+  saveState();
+  closeModal();
+  toast('Enregistré');
+  go('/p/'+patId+'/tcc');
+}
+
+function ouvrirNouveauStuckPoint(patId){
+  openModal('Nouveau stuck point', `
+    <div class="cmi-form">
+      <div class="field"><label>Thème (CPT)</label>
+        <select id="sp-theme" style="width:100%;padding:10px;border:1px solid var(--line-strong);border-radius:8px">
+          ${Object.entries(SP_THEMES).map(([k,v]) => `<option value="${k}">${v}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field"><label>Croyance bloquante (verbalisation de la patiente)</label>
+        <textarea id="sp-texte" rows="3" placeholder="« Je dois avoir provoqué cela pour qu'il me traite comme ça »"></textarea>
+      </div>
+      <div class="field"><label>Force initiale (0-100)</label>
+        <div class="slider-row">
+          <input type="range" id="sp-force" min="0" max="100" value="80" oninput="document.getElementById('sp-force-v').textContent=this.value">
+          <span class="sr-val" id="sp-force-v">80</span>
+        </div>
+      </div>
+    </div>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">Annuler</button><button class="btn btn-primary" onclick="creerStuckPoint('${patId}')">Ajouter</button>`);
+}
+
+function creerStuckPoint(patId){
+  const p = state.patientes.find(x => x.id === patId);
+  if(!p.tcc) p.tcc = { approche:'', impact_statement:'', stuck_points:[], beck_table:[], hierarchie:[] };
+  const texte = document.getElementById('sp-texte').value.trim();
+  if(!texte){ toast('Texte requis'); return; }
+  const force = parseInt(document.getElementById('sp-force').value)||80;
+  const today = new Date().toISOString().slice(0,10);
+  p.tcc.stuck_points.push({
+    id:'sp'+Date.now(),
+    theme:document.getElementById('sp-theme').value,
+    texte, force_initiale:force, force_actuelle:force,
+    historique:[{date:today, force}]
+  });
+  saveState();
+  closeModal();
+  toast('Stuck point ajouté');
+  go('/p/'+patId+'/tcc');
+}
+
+function majStuckPoint(patId, spId){
+  const p = state.patientes.find(x => x.id === patId);
+  const sp = p.tcc.stuck_points.find(x => x.id === spId);
+  openModal('Réévaluer : ' + sp.texte.slice(0,60) + '...', `
+    <p class="text-sm text-muted mb-2">Force initiale : ${sp.force_initiale}% · Force courante : ${sp.force_actuelle}%</p>
+    <div class="cmi-form">
+      <div class="field"><label>Nouvelle force de croyance (0-100)</label>
+        <div class="slider-row">
+          <input type="range" id="msp-f" min="0" max="100" value="${sp.force_actuelle}" oninput="document.getElementById('msp-fv').textContent=this.value">
+          <span class="sr-val" id="msp-fv">${sp.force_actuelle}</span>
+        </div>
+      </div>
+    </div>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">Annuler</button><button class="btn btn-primary" onclick="sauverMajSP('${patId}','${spId}')">Enregistrer</button>`);
+}
+
+function sauverMajSP(patId, spId){
+  const p = state.patientes.find(x => x.id === patId);
+  const sp = p.tcc.stuck_points.find(x => x.id === spId);
+  const force = parseInt(document.getElementById('msp-f').value);
+  sp.force_actuelle = force;
+  if(!sp.historique) sp.historique = [];
+  sp.historique.push({ date:new Date().toISOString().slice(0,10), force });
+  saveState();
+  closeModal();
+  toast('Mis à jour');
+  go('/p/'+patId+'/tcc');
+}
+
+function ouvrirNouveauBeck(patId){
+  openModal('Tableau de Beck — Nouvelle entrée', `
+    <div class="cmi-form">
+      <div class="field"><label>Situation</label>
+        <div class="hint">Qui, quoi, où, quand. Faits objectifs.</div>
+        <textarea id="bk-sit" rows="2"></textarea>
+      </div>
+      <div class="field"><label>Émotion(s) ressentie(s)</label>
+        <input type="text" id="bk-emo" placeholder="peur, colère, tristesse, honte...">
+      </div>
+      <div class="field"><label>Intensité émotionnelle (0-100)</label>
+        <div class="slider-row"><input type="range" id="bk-iemo" min="0" max="100" value="70" oninput="document.getElementById('bk-iemo-v').textContent=this.value"><span class="sr-val" id="bk-iemo-v">70</span></div>
+      </div>
+      <div class="field"><label>Pensée automatique</label>
+        <textarea id="bk-pa" rows="2" placeholder="« Il va recommencer », « Je vais échouer », etc."></textarea>
+      </div>
+      <div class="field"><label>Niveau de croyance dans cette pensée (0-100)</label>
+        <div class="slider-row"><input type="range" id="bk-cpa" min="0" max="100" value="80" oninput="document.getElementById('bk-cpa-v').textContent=this.value"><span class="sr-val" id="bk-cpa-v">80</span></div>
+      </div>
+      <div class="field"><label>Pensée alternative</label>
+        <div class="hint">Quels faits soutiennent cette nouvelle pensée ? Que dirait une amie bienveillante ?</div>
+        <textarea id="bk-pal" rows="3"></textarea>
+      </div>
+      <div class="field"><label>Niveau de croyance dans la pensée alternative (0-100)</label>
+        <div class="slider-row"><input type="range" id="bk-cpal" min="0" max="100" value="50" oninput="document.getElementById('bk-cpal-v').textContent=this.value"><span class="sr-val" id="bk-cpal-v">50</span></div>
+      </div>
+      <div class="field"><label>Ré-évaluation de l'émotion (0-100)</label>
+        <div class="slider-row"><input type="range" id="bk-reemo" min="0" max="100" value="40" oninput="document.getElementById('bk-reemo-v').textContent=this.value"><span class="sr-val" id="bk-reemo-v">40</span></div>
+      </div>
+    </div>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">Annuler</button><button class="btn btn-primary" onclick="creerBeck('${patId}')">Ajouter</button>`);
+}
+
+function creerBeck(patId){
+  const p = state.patientes.find(x => x.id === patId);
+  if(!p.tcc) p.tcc = { approche:'', impact_statement:'', stuck_points:[], beck_table:[], hierarchie:[] };
+  const sit = document.getElementById('bk-sit').value.trim();
+  if(!sit){ toast('Situation requise'); return; }
+  p.tcc.beck_table.push({
+    id:'b'+Date.now(),
+    date:new Date().toISOString().slice(0,10),
+    situation:sit,
+    emotion:document.getElementById('bk-emo').value,
+    intensite_emo:parseInt(document.getElementById('bk-iemo').value),
+    pensee_auto:document.getElementById('bk-pa').value,
+    croyance_pa:parseInt(document.getElementById('bk-cpa').value),
+    pensee_alt:document.getElementById('bk-pal').value,
+    croyance_alt:parseInt(document.getElementById('bk-cpal').value),
+    reeval_emo:parseInt(document.getElementById('bk-reemo').value)
+  });
+  saveState();
+  closeModal();
+  toast('Entrée Beck ajoutée');
+  go('/p/'+patId+'/tcc');
+}
+
+function ouvrirNouvelleExpo(patId){
+  openModal('Hiérarchie d\'exposition — Nouvelle situation', `
+    <div class="cmi-form">
+      <div class="field"><label>Situation évitée (sécuritaire)</label>
+        <textarea id="ex-sit" rows="2" placeholder="Ex : Prendre le métro aux heures de pointe"></textarea>
+      </div>
+      <div class="field"><label>SUDS initial (0-100)</label>
+        <div class="slider-row"><input type="range" id="ex-si" min="0" max="100" value="70" oninput="document.getElementById('ex-si-v').textContent=this.value"><span class="sr-val" id="ex-si-v">70</span></div>
+      </div>
+      <div class="field"><label>SUDS objectif (0-100)</label>
+        <div class="hint">Habituellement la moitié du SUDS initial.</div>
+        <div class="slider-row"><input type="range" id="ex-so" min="0" max="100" value="30" oninput="document.getElementById('ex-so-v').textContent=this.value"><span class="sr-val" id="ex-so-v">30</span></div>
+      </div>
+    </div>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">Annuler</button><button class="btn btn-primary" onclick="creerExpo('${patId}')">Ajouter</button>`);
+}
+
+function creerExpo(patId){
+  const p = state.patientes.find(x => x.id === patId);
+  if(!p.tcc) p.tcc = { approche:'', impact_statement:'', stuck_points:[], beck_table:[], hierarchie:[] };
+  const sit = document.getElementById('ex-sit').value.trim();
+  if(!sit){ toast('Situation requise'); return; }
+  const si = parseInt(document.getElementById('ex-si').value);
+  p.tcc.hierarchie.push({
+    id:'h'+Date.now(),
+    situation:sit,
+    suds_initial:si, suds_actuel:si,
+    suds_objectif:parseInt(document.getElementById('ex-so').value),
+    complete:false,
+    historique:[{date:new Date().toISOString().slice(0,10), suds:si}]
+  });
+  saveState();
+  closeModal();
+  toast('Situation ajoutée');
+  go('/p/'+patId+'/tcc');
+}
+
+function majExpo(patId, hId){
+  const p = state.patientes.find(x => x.id === patId);
+  const h = p.tcc.hierarchie.find(x => x.id === hId);
+  openModal('SUDS — ' + h.situation.slice(0,50) + '...', `
+    <p class="text-sm text-muted mb-2">Initial : ${h.suds_initial} · Actuel : ${h.suds_actuel} · Objectif : ${h.suds_objectif}</p>
+    <div class="cmi-form">
+      <div class="field"><label>Nouveau SUDS (0-100)</label>
+        <div class="slider-row"><input type="range" id="mex-s" min="0" max="100" value="${h.suds_actuel}" oninput="document.getElementById('mex-sv').textContent=this.value"><span class="sr-val" id="mex-sv">${h.suds_actuel}</span></div>
+      </div>
+      <div class="field"><label><input type="checkbox" id="mex-comp" ${h.complete?'checked':''}> Habituation atteinte (situation maîtrisée)</label></div>
+    </div>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">Annuler</button><button class="btn btn-primary" onclick="sauverMajExpo('${patId}','${hId}')">Enregistrer</button>`);
+}
+
+function sauverMajExpo(patId, hId){
+  const p = state.patientes.find(x => x.id === patId);
+  const h = p.tcc.hierarchie.find(x => x.id === hId);
+  h.suds_actuel = parseInt(document.getElementById('mex-s').value);
+  h.complete = document.getElementById('mex-comp').checked;
+  if(!h.historique) h.historique = [];
+  h.historique.push({ date:new Date().toISOString().slice(0,10), suds:h.suds_actuel });
+  saveState();
+  closeModal();
+  toast('Mis à jour');
+  go('/p/'+patId+'/tcc');
+}
+
+function renderTCCCharts(p){
+  const wrap = document.getElementById('tcc-chart');
+  if(!wrap || !p.tcc || !p.tcc.stuck_points) return;
+  const sps = p.tcc.stuck_points.filter(sp => sp.historique && sp.historique.length > 0);
+  if(sps.length === 0){ wrap.innerHTML = '<div class="empty"><div class="em-s">Pas d\'historique.</div></div>'; return; }
+
+  const W = 760, H = 240, mL = 40, mR = 16, mT = 16, mB = 32;
+  const plotW = W - mL - mR, plotH = H - mT - mB;
+  const colors = { 'securite':'#C75B5B', 'confiance':'#D89B4A', 'pouvoir':'#3E5C76', 'estime':'#7a3a7a', 'intimite':'#5C8374' };
+
+  const allDates = sps.flatMap(sp => sp.historique.map(h => new Date(h.date)));
+  const xMin = Math.min(...allDates), xMax = Math.max(...allDates);
+  const xRange = Math.max(1, xMax - xMin);
+  const xPos = d => mL + ((d - xMin) / xRange) * plotW;
+  const yPos = f => mT + plotH - (f / 100) * plotH;
+
+  let grid = '';
+  [0,25,50,75,100].forEach(v => {
+    const y = yPos(v);
+    grid += `<line x1="${mL}" y1="${y}" x2="${W-mR}" y2="${y}" stroke="rgba(26,23,20,.08)" stroke-dasharray="3 3"/>`;
+    grid += `<text x="${mL-6}" y="${y+4}" text-anchor="end" font-size="10" fill="#6B6359">${v}</text>`;
+  });
+
+  let xAxis = '';
+  for(let i = 0; i <= 4; i++){
+    const d = new Date(xMin + (xRange * i / 4));
+    const x = mL + plotW * i / 4;
+    xAxis += `<text x="${x}" y="${H-mB+16}" text-anchor="middle" font-size="10" fill="#6B6359">${formatDateShort(d)}</text>`;
+  }
+
+  let lines = '';
+  sps.forEach(sp => {
+    const col = colors[sp.theme] || '#888';
+    const points = sp.historique.map(h => ({ x:new Date(h.date), y:h.force }));
+    const d = points.map((pt,i) => `${i===0?'M':'L'}${xPos(pt.x)},${yPos(pt.y)}`).join(' ');
+    lines += `<path d="${d}" fill="none" stroke="${col}" stroke-width="2"/>`;
+    points.forEach(pt => {
+      lines += `<circle cx="${xPos(pt.x)}" cy="${yPos(pt.y)}" r="3.5" fill="#fff" stroke="${col}" stroke-width="2"/>`;
+    });
+  });
+
+  wrap.innerHTML = `
+    <div class="chart-legend">
+      ${sps.map(sp => `<div class="li"><span class="dot" style="background:${colors[sp.theme]||'#888'}"></span>${SP_THEMES[sp.theme]} — « ${sp.texte.slice(0,40)}${sp.texte.length>40?'…':''} »</div>`).join('')}
+    </div>
+    <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;max-height:280px">
+      ${grid}${xAxis}${lines}
+      <text x="${mL-30}" y="${mT+plotH/2}" text-anchor="middle" font-size="10" fill="#6B6359" transform="rotate(-90 ${mL-30} ${mT+plotH/2})">force (0-100)</text>
+    </svg>
+  `;
+}
+
+/* ============================================================
+   Passation d'une échelle (suite — section originale)
+   ============================================================ */
+
+function ouvrirNouvelleEchelle(id){
+  openModal('Nouvelle évaluation', `
+    <p class="text-sm text-muted mb-2">Sélectionnez l'échelle à passer :</p>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      ${Object.values(ECHELLES).map(e => `
+        <button class="btn btn-secondary" style="justify-content:flex-start;text-align:left;padding:14px" onclick="closeModal();go('/p/${id}/echelle/${e.nom}')">
+          <div>
+            <div style="font-weight:600;font-size:14px">${e.titre}</div>
+            <div style="font-size:12px;color:var(--ink-3);font-weight:400;margin-top:2px">${e.sub}</div>
+          </div>
+        </button>
+      `).join('')}
+    </div>
+  `, '<button class="btn btn-secondary" onclick="closeModal()">Annuler</button>');
+}
+
+let _ech_answers = {};
+function renderPassationEchelle(patId, nom){
+  const p = state.patientes.find(x => x.id === patId);
+  const ech = ECHELLES[nom];
+  if(!p || !ech){ go('/p/'+patId); return; }
+  _ech_answers = {};
+
+  document.getElementById('app').innerHTML = `
+    <div class="app">
+      ${sidebarHTML(p.id)}
+      <div class="main">
+        <div class="main-head">
+          <div>
+            <div class="crumbs">${p.prenom} ${p.nom_initial} › Évaluation</div>
+            <h1>${ech.titre}</h1>
+          </div>
+          <button class="btn btn-secondary" onclick="go('/p/${p.id}/synthese')">Annuler</button>
+        </div>
+        <div class="main-body">
+          <div class="echelle">
+            <p class="e-sub">${ech.sub}</p>
+            <div class="e-intro">${ech.intro}</div>
+            <div id="ech-questions">
+              ${ech.items.map((it, i) => `
+                <div class="q">
+                  <div class="q-num">Item ${i+1} / ${ech.items.length}</div>
+                  <div class="q-text">${it.q}</div>
+                  <div class="q-opts">
+                    ${it.o.map(([lbl, val]) => `
+                      <button class="q-opt" data-i="${i}" data-v="${val}" onclick="repondre(${i},${val},this)">${lbl}</button>
+                    `).join('')}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+            <div class="echelle-foot">
+              <div class="echelle-progress">
+                <div class="bar"><div class="fill" id="ech-fill" style="width:0%"></div></div>
+                <div class="txt" id="ech-progress-txt">0 / ${ech.items.length} item${ech.items.length>1?'s':''}</div>
+              </div>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-ghost" onclick="autoRemplir('${nom}')">Auto-remplir (démo)</button>
+                <button class="btn btn-primary" id="ech-submit" onclick="validerEchelle('${p.id}','${nom}')" disabled>Calculer le score</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function repondre(i, v, btn){
+  _ech_answers[i] = v;
+  document.querySelectorAll(`.q-opt[data-i="${i}"]`).forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  const total = Object.keys(_ech_answers).length;
+  const max = document.querySelectorAll('.q').length;
+  document.getElementById('ech-fill').style.width = (total/max*100) + '%';
+  document.getElementById('ech-progress-txt').textContent = `${total} / ${max} item${max>1?'s':''}`;
+  document.getElementById('ech-submit').disabled = total < max;
+}
+
+function autoRemplir(nom){
+  const ech = ECHELLES[nom];
+  ech.items.forEach((it, i) => {
+    const opts = it.o;
+    // tirage pondéré vers le milieu pour variété
+    const idx = Math.min(opts.length - 1, Math.floor(Math.random() * opts.length));
+    const v = opts[idx][1];
+    const btn = document.querySelector(`.q-opt[data-i="${i}"][data-v="${v}"]`);
+    if(btn) repondre(i, v, btn);
+  });
+}
+
+function validerEchelle(patId, nom){
+  const ech = ECHELLES[nom];
+  const result = ech.score(_ech_answers);
+  const p = state.patientes.find(x => x.id === patId);
+  p.echelles.push({
+    nom, date: new Date().toISOString().slice(0,10),
+    score: result.total, max: result.max,
+    items:{ ..._ech_answers },
+    interpretation: result.interpretation
+  });
+  saveState();
+
+  document.querySelector('.main-body').innerHTML = `
+    <div class="result">
+      <div class="result-score">
+        <div class="val">${result.total}<span class="max">/${result.max}</span></div>
+        <div class="label">Score brut</div>
+      </div>
+      <div class="result-interp ${result.cls}">
+        <h4>${ech.titre.split('—')[1].trim()} — ${result.interpretation}</h4>
+        <p>${result.message}</p>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn btn-secondary" onclick="go('/p/${patId}/echelle/${nom}')">Refaire</button>
+        <button class="btn btn-primary" onclick="go('/p/${patId}/synthese')">Voir la synthèse →</button>
+      </div>
+    </div>
+  `;
+}
+
+/* ============================================================
+   CMI guidé HAS 2011
+   ============================================================ */
+
+function renderCMI(patId){
+  const p = state.patientes.find(x => x.id === patId);
+  if(!p){ go('/p'); return; }
+
+  document.getElementById('app').innerHTML = `
+    <div class="app">
+      ${sidebarHTML(p.id)}
+      <div class="main">
+        <div class="main-head">
+          <div>
+            <div class="crumbs">${p.prenom} ${p.nom_initial} › CMI</div>
+            <h1>Rédaction d'un certificat médical initial</h1>
+          </div>
+          <button class="btn btn-secondary" onclick="go('/p/${p.id}/cmi')">Annuler</button>
+        </div>
+        <div class="main-body">
+          <div class="row" style="align-items:flex-start">
+            <div class="section" style="flex:1;min-width:340px">
+              <div class="section-head"><h3>Formulaire guidé</h3><div class="meta">Structure HAS 2011</div></div>
+              <div class="cmi-form">
+                <div class="field"><label>Date du certificat</label><input type="date" id="cmi-date" value="${new Date().toISOString().slice(0,10)}" oninput="majCMI()"></div>
+                <div class="field"><label>Médecin (nom, qualification)</label><input type="text" id="cmi-medecin" placeholder="Dr Céline X — Psychiatre" oninput="majCMI()"></div>
+                <div class="field"><label>Lieu de rédaction</label><input type="text" id="cmi-lieu" placeholder="Lille (59)" oninput="majCMI()"></div>
+
+                <div class="field"><label>Doléances rapportées par la patiente</label>
+                  <div class="hint">À transcrire entre guillemets, fidèlement aux propos. Ne pas interpréter.</div>
+                  <textarea id="cmi-dole" rows="4" placeholder="« … »" oninput="majCMI()"></textarea>
+                </div>
+
+                <div class="field"><label>Examen clinique — lésions constatées</label>
+                  <div class="hint">Description précise : type, localisation, mesures, couleur, ancienneté présumée. Si absence, l'écrire.</div>
+                  <textarea id="cmi-lesions" rows="3" placeholder="ex : Hématome violacé de 3×4 cm en regard de la face externe du bras gauche, compatible avec un traumatisme contondant…" oninput="majCMI()"></textarea>
+                </div>
+
+                <div class="field"><label>État psychique observé</label>
+                  <div class="hint">Description objective : pleurs, tremblements, prostration, hypervigilance, etc.</div>
+                  <textarea id="cmi-psy" rows="3" placeholder="ex : Patiente prostrée, pleurs continus, tremblements des mains, sursauts au bruit…" oninput="majCMI()"></textarea>
+                </div>
+
+                <div class="field"><label>Retentissement sur la vie quotidienne</label>
+                  <div class="hint">Activités usuelles, professionnelles, scolaires, sociales.</div>
+                  <textarea id="cmi-reten" rows="3" placeholder="ex : Arrêt de travail nécessaire. Difficulté à dormir. Évite les lieux liés à l'agression…" oninput="majCMI()"></textarea>
+                </div>
+
+                <div class="field"><label>ITT proposée (en jours)</label>
+                  <div class="hint">Incapacité Totale de Travail au sens pénal — concerne le retentissement global, pas l'arrêt professionnel.</div>
+                  <input type="text" id="cmi-itt" placeholder="ex : 15" oninput="majCMI()">
+                </div>
+
+                <div class="field">
+                  <label style="display:flex;align-items:center;gap:8px;font-weight:400;cursor:pointer">
+                    <input type="checkbox" id="cmi-signal" onchange="majCMI()"> Mentionner le cadre légal du signalement (art. 226-14 CP)
+                  </label>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:16px">
+                <button class="btn btn-secondary" onclick="autoremplirCMI('${p.id}')">Pré-remplir avec exemple</button>
+                <button class="btn btn-primary" onclick="sauverCMI('${p.id}')">Enregistrer</button>
+              </div>
+            </div>
+
+            <div class="section" style="flex:1;min-width:340px;position:sticky;top:0">
+              <div class="section-head"><h3>Aperçu</h3><div class="meta">Mise à jour temps réel</div></div>
+              <div class="cmi-preview" id="cmi-preview"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  majCMI();
+
+  // Pré-remplir avec données patiente
+  const today = new Date().toISOString().slice(0,10);
+  document.getElementById('cmi-date').value = today;
+}
+
+function majCMI(){
+  const date = (document.getElementById('cmi-date')||{}).value || '';
+  const med = (document.getElementById('cmi-medecin')||{}).value || '[Nom du médecin]';
+  const lieu = (document.getElementById('cmi-lieu')||{}).value || '[Lieu]';
+  const dole = (document.getElementById('cmi-dole')||{}).value || '';
+  const les = (document.getElementById('cmi-lesions')||{}).value || '';
+  const psy = (document.getElementById('cmi-psy')||{}).value || '';
+  const reten = (document.getElementById('cmi-reten')||{}).value || '';
+  const itt = (document.getElementById('cmi-itt')||{}).value || '';
+  const sig = (document.getElementById('cmi-signal')||{}).checked;
+
+  const path = window.location.hash.split('/');
+  const patId = path[2];
+  const p = state.patientes.find(x => x.id === patId);
+  const ident = p ? `${p.prenom} ${p.nom_initial}, âgée de ${p.age} ans` : '[Identité de la patiente]';
+
+  const html = `
+    <div class="cmi-header">
+      <strong>CERTIFICAT MÉDICAL INITIAL</strong><br>
+      <span style="font-size:13px;color:var(--ink-3)">Établi conformément aux recommandations HAS 2011</span>
+    </div>
+
+    <p>Je soussigné(e), <strong>${med}</strong>, certifie avoir examiné ce jour, à ${lieu}, le ${formatDateLong(date)},
+    à sa demande, <strong>${ident}</strong>.</p>
+
+    <h4>Doléances rapportées</h4>
+    <p>${dole ? escapeHtml(dole).replace(/\n/g,'<br>') : '<em style="color:var(--ink-3)">(à compléter)</em>'}</p>
+
+    <h4>Examen clinique</h4>
+    <p>${les ? escapeHtml(les).replace(/\n/g,'<br>') : '<em style="color:var(--ink-3)">(à compléter)</em>'}</p>
+
+    <h4>État psychique observé</h4>
+    <p>${psy ? escapeHtml(psy).replace(/\n/g,'<br>') : '<em style="color:var(--ink-3)">(à compléter)</em>'}</p>
+
+    <h4>Retentissement</h4>
+    <p>${reten ? escapeHtml(reten).replace(/\n/g,'<br>') : '<em style="color:var(--ink-3)">(à compléter)</em>'}</p>
+
+    <h4>Incapacité totale de travail (ITT)</h4>
+    <p>Au sens pénal, l'ITT est évaluée à <strong>${itt || '___'} jour${itt && parseInt(itt) > 1 ? 's' : ''}</strong>, sous réserve de complications.</p>
+
+    ${sig ? `
+      <h4>Cadre du signalement</h4>
+      <p style="font-size:13px;color:var(--ink-2)">Conformément à l'article 226-14 du Code pénal, le secret professionnel n'est pas opposable à la révélation d'informations à caractère secret aux autorités judiciaires ou administratives concernant les violences exercées sur une personne adulte qui n'est pas en mesure de se protéger, avec son accord — ou sans son accord en cas de danger immédiat.</p>
+    ` : ''}
+
+    <p style="margin-top:24px">Certificat établi en double exemplaire, le ${formatDateLong(date)}, remis en main propre à l'intéressée pour faire valoir ce que de droit.</p>
+    <p style="margin-top:30px"><strong>${med}</strong></p>
+  `;
+  const prev = document.getElementById('cmi-preview');
+  if(prev) prev.innerHTML = html;
+}
+
+function autoremplirCMI(patId){
+  const p = state.patientes.find(x => x.id === patId);
+  document.getElementById('cmi-medecin').value = 'Dr Céline X — Psychiatre';
+  document.getElementById('cmi-lieu').value = 'Lille (59)';
+  document.getElementById('cmi-dole').value = `« Il m'a saisie par le cou et m'a plaquée contre le mur. J'ai cru que j'allais mourir. C'est la troisième fois ce mois-ci. Avant il me criait dessus, maintenant il me frappe. »`;
+  document.getElementById('cmi-lesions').value = `Hématome violacé d'environ 4×3 cm en regard de la face latérale gauche du cou, compatible avec un traumatisme par préhension. Pas d'autres lésions visibles ce jour.`;
+  document.getElementById('cmi-psy').value = `Patiente recroquevillée, pleurs continus. Tremblements des extrémités. Hypervigilance. Sursauts importants aux bruits extérieurs. Difficultés majeures à verbaliser les faits.`;
+  document.getElementById('cmi-reten').value = `Insomnie sévère depuis l'événement (3 nuits). Cauchemars répétés. Évitement du domicile (hébergée chez sa sœur). Incapacité à reprendre son activité professionnelle dans l'immédiat. Hyperréactivité émotionnelle.`;
+  document.getElementById('cmi-itt').value = '15';
+  document.getElementById('cmi-signal').checked = true;
+  majCMI();
+}
+
+function sauverCMI(patId){
+  const p = state.patientes.find(x => x.id === patId);
+  const date = document.getElementById('cmi-date').value;
+  const itt = parseInt(document.getElementById('cmi-itt').value) || 0;
+  const contenu = document.getElementById('cmi-preview').innerHTML;
+  if(!p.cmi) p.cmi = [];
+  p.cmi.push({ date, itt, contenu });
+  saveState();
+  toast('CMI enregistré');
+  setTimeout(()=>go('/p/'+patId+'/cmi'), 300);
+}
+
+/* ============================================================
+   Notes de séance
+   ============================================================ */
+
+function ouvrirNouvelleNote(patId){
+  openModal('Note de séance', `
+    <div class="cmi-form">
+      <div class="field"><label>Date</label><input type="date" id="note-date" value="${new Date().toISOString().slice(0,10)}"></div>
+      <div class="field"><label>Contenu de la séance</label><textarea id="note-txt" rows="10" placeholder="Notes cliniques, observations, interventions, suite envisagée…"></textarea></div>
+    </div>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">Annuler</button><button class="btn btn-primary" onclick="sauverNote('${patId}')">Enregistrer</button>`);
+}
+
+function sauverNote(patId){
+  const p = state.patientes.find(x => x.id === patId);
+  const date = document.getElementById('note-date').value;
+  const texte = document.getElementById('note-txt').value.trim();
+  if(!texte){ toast('Note vide'); return; }
+  p.notes.push({ date, texte });
+  saveState();
+  closeModal();
+  toast('Note ajoutée');
+  go('/p/'+patId+'/notes');
+}
+
+/* ============================================================
+   ESPACE PATIENTE
+   ============================================================ */
+
+function renderPatiente(tab){
+  tab = tab || 'accueil';
+  let body = '';
+  if(tab === 'accueil') body = patAccueilHTML();
+  else if(tab === 'journal') body = patJournalHTML();
+  else if(tab === 'outils') body = patOutilsHTML();
+  else if(tab === 'securite') body = patSecuriteHTML();
+  else if(tab === 'urgence') body = patUrgenceHTML();
+
+  document.getElementById('app').innerHTML = `
+    <div class="pat-app">
+      <div class="pat-head">
+        <div class="greet">${greetText()}</div>
+        <div class="greet-sub">${dayText()}</div>
+      </div>
+      <div class="pat-body">${body}</div>
+      <div class="pat-nav">
+        <div class="pat-nav-item ${tab==='accueil'?'active':''}" onclick="go('/u/accueil')"><div class="ic">⌂</div><div>Accueil</div></div>
+        <div class="pat-nav-item ${tab==='journal'?'active':''}" onclick="go('/u/journal')"><div class="ic">✎</div><div>Journal</div></div>
+        <div class="pat-nav-item ${tab==='outils'?'active':''}" onclick="go('/u/outils')"><div class="ic">✿</div><div>Outils</div></div>
+        <div class="pat-nav-item ${tab==='securite'?'active':''}" onclick="go('/u/securite')"><div class="ic">⚓</div><div>Sécurité</div></div>
+        <div class="pat-nav-item ${tab==='urgence'?'active':''}" onclick="go('/u/urgence')"><div class="ic">!</div><div>Urgences</div></div>
+      </div>
+    </div>
+  `;
+}
+
+function greetText(){
+  const h = new Date().getHours();
+  if(h < 6) return 'Bonne nuit.';
+  if(h < 12) return 'Bonjour.';
+  if(h < 18) return 'Bon après-midi.';
+  return 'Bonsoir.';
+}
+function dayText(){
+  return new Date().toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' });
+}
+
+function patAccueilHTML(){
+  const lastMood = (state.journal || []).slice(-1)[0];
+  return `
+    <div class="pat-sos" onclick="go('/u/urgence')">
+      <div class="ic">⚠</div>
+      <div>
+        <div class="lbl">J'ai besoin d'aide maintenant</div>
+        <div class="sub">3919 · 17 · 114 · 3114</div>
+      </div>
+    </div>
+
+    <div class="pat-card">
+      <h3>Comment je me sens aujourd'hui</h3>
+      <div class="pc-sub">Un seul clic, juste pour vous.</div>
+      <div class="mood-row" id="mood-row">
+        ${[
+          ['😔','très bas',1],
+          ['😟','bas',3],
+          ['😐','neutre',5],
+          ['🙂','correct',7],
+          ['😌','apaisé',9]
+        ].map(([e,l,v]) => `<div class="mood-btn" data-v="${v}" title="${l}" onclick="enregMood(${v},this)">${e}</div>`).join('')}
+      </div>
+      ${lastMood ? `<div class="text-xs text-muted mt-2">Dernière entrée : ${formatDateRelative(lastMood.date)}</div>` : ''}
+    </div>
+
+    <div class="pat-card" onclick="go('/u/outils')" style="cursor:pointer">
+      <h3>Un outil pour reprendre pied</h3>
+      <div class="pc-sub">Ancrage 5-4-3-2-1 · Cohérence cardiaque</div>
+    </div>
+
+    <div class="pat-card" onclick="go('/u/journal')" style="cursor:pointer">
+      <h3>Mon journal</h3>
+      <div class="pc-sub">${(state.journal||[]).length} entrée${(state.journal||[]).length>1?'s':''} · Privé, sur cet appareil uniquement.</div>
+    </div>
+  `;
+}
+
+function enregMood(v, btn){
+  document.querySelectorAll('#mood-row .mood-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  const today = new Date().toISOString().slice(0,10);
+  state.journal.push({ date: today, humeur: v, texte:'', tags:[], heure: new Date().toISOString() });
+  saveState();
+  toast('Humeur enregistrée');
+}
+
+function patJournalHTML(){
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h3 class="serif" style="font-size:20px;font-weight:600">Mon journal</h3>
+      <button class="btn btn-primary btn-sm" onclick="ouvrirEcrireJournal()">+ Écrire</button>
+    </div>
+
+    ${(state.journal || []).length === 0 ? `
+      <div class="empty"><div class="em-ic">✎</div><div class="em-t">Aucune entrée pour le moment</div><div class="em-s">Vos pensées restent ici, sur votre appareil.</div></div>
+    ` : (state.journal || []).slice().reverse().map(e => `
+      <div class="journal-item">
+        <div class="jd">${formatDateLong(e.date)}${e.humeur?' · humeur '+e.humeur+'/10':''}</div>
+        ${e.texte ? `<div class="jt">${escapeHtml(e.texte)}</div>` : ''}
+        ${(e.tags||[]).length ? `<div class="jm">${(e.tags||[]).map(t => `<span class="pill" style="margin-right:4px">${t}</span>`).join('')}</div>` : ''}
+      </div>
+    `).join('')}
+  `;
+}
+
+function ouvrirEcrireJournal(){
+  openModal('Nouvelle entrée', `
+    <div class="cmi-form">
+      <div class="field"><label>Comment vous sentez-vous ? (1 à 10)</label>
+        <input type="range" id="j-mood" min="1" max="10" value="5" oninput="document.getElementById('j-mood-v').textContent=this.value">
+        <div class="text-xs text-muted" id="j-mood-v">5</div>
+      </div>
+      <div class="field"><label>Ce que vous voulez écrire</label>
+        <textarea id="j-txt" rows="8" placeholder="Tout ce que vous voulez. Personne d'autre ne lira ceci."></textarea>
+      </div>
+      <div class="field"><label>Étiquettes (optionnel)</label>
+        <div class="row" style="gap:6px">
+          ${['peur','colère','tristesse','espoir','fierté','fatigue','calme'].map(t => `
+            <button class="q-opt" type="button" onclick="this.classList.toggle('selected')" data-tag="${t}">${t}</button>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">Annuler</button><button class="btn btn-primary" onclick="sauverJournal()">Enregistrer</button>`);
+}
+
+function sauverJournal(){
+  const humeur = parseInt(document.getElementById('j-mood').value);
+  const texte = document.getElementById('j-txt').value.trim();
+  const tags = Array.from(document.querySelectorAll('[data-tag].selected')).map(b => b.dataset.tag);
+  state.journal.push({ date: new Date().toISOString().slice(0,10), humeur, texte, tags, heure: new Date().toISOString() });
+  saveState();
+  closeModal();
+  toast('Entrée enregistrée');
+  renderPatiente('journal');
+}
+
+function patOutilsHTML(){
+  return `
+    <h3 class="serif" style="font-size:20px;font-weight:600;margin-bottom:12px">Quand ça déborde</h3>
+    <p class="text-sm text-muted mb-2">Des outils simples, à utiliser au moment où vous en avez besoin.</p>
+
+    <div class="pat-card" onclick="ouvrirAncrage()" style="cursor:pointer">
+      <h3>Ancrage 5-4-3-2-1</h3>
+      <div class="pc-sub">Pour revenir dans le présent. 5 choses que je vois, 4 que je touche, 3 que j'entends, 2 que je sens, 1 que je goûte. Environ 3 minutes.</div>
+    </div>
+
+    <div class="pat-card" onclick="ouvrirRespiration()" style="cursor:pointer">
+      <h3>Cohérence cardiaque</h3>
+      <div class="pc-sub">Respiration guidée 5 secondes / 5 secondes pendant 5 minutes. Apaise le système nerveux.</div>
+    </div>
+
+    <div class="pat-card" onclick="ouvrirInfo('emdr')" style="cursor:pointer">
+      <h3>Comprendre l'EMDR</h3>
+      <div class="pc-sub">Si votre thérapeute vous parle d'EMDR : ce que c'est, comment ça se passe, à quoi ça sert. (~ 2 min de lecture)</div>
+    </div>
+
+    <div class="pat-card" onclick="ouvrirInfo('tcc')" style="cursor:pointer">
+      <h3>Comprendre les TCC</h3>
+      <div class="pc-sub">Si votre thérapeute vous parle de CPT, d'exposition, de tableau de Beck : les principes en mots simples. (~ 2 min)</div>
+    </div>
+
+    <div class="pat-card" onclick="ouvrirPensees()" style="cursor:pointer">
+      <h3>Mes pensées</h3>
+      <div class="pc-sub">Un mini-carnet pour noter une pensée qui revient, l'émotion associée, et tenter une autre lecture. ${(state.pensees || []).length} entrée${(state.pensees || []).length>1?'s':''}.</div>
+    </div>
+  `;
+}
+
+function ouvrirInfo(type){
+  const contenus = {
+    'emdr':`
+      <p class="serif text-sm" style="font-style:italic;line-height:1.7;margin-bottom:14px;color:var(--ink-2)">L'EMDR (Eye Movement Desensitization and Reprocessing) est une psychothérapie utilisée pour traiter les conséquences du psychotraumatisme. Reconnue par la HAS, l'OMS et l'INSERM.</p>
+
+      <h4 class="serif" style="font-size:15px;font-weight:600;margin:14px 0 6px">Comment ça marche</h4>
+      <p class="text-sm" style="line-height:1.6;color:var(--ink-2)">Quand un événement traumatique a été trop fort pour être "digéré" par votre cerveau, il reste comme bloqué — avec ses images, ses sensations, ses émotions intactes. L'EMDR aide votre cerveau à reprendre ce travail de digestion qui n'a pas pu se faire, en utilisant des stimulations alternées (mouvements des yeux, sons, tapotements).</p>
+
+      <h4 class="serif" style="font-size:15px;font-weight:600;margin:14px 0 6px">Les 8 étapes</h4>
+      <p class="text-sm" style="line-height:1.6;color:var(--ink-2)">1. <strong>Votre histoire</strong> — votre thérapeute apprend à vous connaître et identifie les souvenirs à traiter.<br>
+      2. <strong>Préparation</strong> — vous installez un "lieu sûr" mental, des ressources, un signal STOP. Cette phase peut être longue, c'est normal.<br>
+      3. <strong>Évaluation</strong> — vous décrivez un souvenir précis : l'image, ce que vous pensez de vous, ce que vous aimeriez croire, l'émotion, la sensation.<br>
+      4-6. <strong>Retraitement</strong> — avec les stimulations alternées, le souvenir change. Vous pouvez observer ce qui vient sans avoir à tout raconter.<br>
+      7. <strong>Clôture</strong> — chaque séance se termine par un retour au calme.<br>
+      8. <strong>Réévaluation</strong> — la séance suivante commence par vérifier ce qui s'est passé.</p>
+
+      <h4 class="serif" style="font-size:15px;font-weight:600;margin:14px 0 6px">Ce que ça ne change pas</h4>
+      <p class="text-sm" style="line-height:1.6;color:var(--ink-2)">L'EMDR ne fait pas oublier. Le souvenir reste, mais sa charge émotionnelle diminue : on peut y penser sans être à nouveau submergée.</p>
+
+      <p class="text-xs text-muted mt-3" style="line-height:1.5">Sources : EMDR France (efpe.fr), IFEMDR.fr, Trauma Aid France, HAS 2007.</p>
+    `,
+    'tcc':`
+      <p class="serif text-sm" style="font-style:italic;line-height:1.7;margin-bottom:14px;color:var(--ink-2)">Les TCC (Thérapies Cognitivo-Comportementales) regroupent plusieurs approches qui travaillent sur le lien entre pensées, émotions et comportements. Plusieurs sont recommandées dans le traitement du psychotrauma.</p>
+
+      <h4 class="serif" style="font-size:15px;font-weight:600;margin:14px 0 6px">La CPT (Cognitive Processing Therapy)</h4>
+      <p class="text-sm" style="line-height:1.6;color:var(--ink-2)">Développée par Patricia Resick. 12 séances. L'idée : un traumatisme abîme certaines croyances (sur soi, les autres, le monde). Ces croyances bloquées sont appelées "stuck points". Avec votre thérapeute, vous les identifiez et les examinez : sont-elles vraies à 100% ? Y a-t-il d'autres lectures possibles ? Cinq thèmes sont travaillés : sécurité, confiance, pouvoir, estime, intimité.</p>
+
+      <h4 class="serif" style="font-size:15px;font-weight:600;margin:14px 0 6px">L'exposition prolongée (Foa)</h4>
+      <p class="text-sm" style="line-height:1.6;color:var(--ink-2)">L'évitement (de lieux, de pensées, de sensations) protège à court terme, mais entretient la peur sur le long terme. L'exposition consiste à approcher progressivement — avec votre thérapeute — ce que vous évitez : raconter le souvenir, ou retourner dans des lieux/situations sécuritaires que vous fuyez. À chaque exposition, le niveau de peur diminue.</p>
+
+      <h4 class="serif" style="font-size:15px;font-weight:600;margin:14px 0 6px">Le tableau de Beck</h4>
+      <p class="text-sm" style="line-height:1.6;color:var(--ink-2)">Un outil simple : Situation → Émotion → Pensée automatique → Pensée alternative → Ré-évaluation. Quand une émotion forte arrive, vous notez ce qui s'est passé, ce que vous avez ressenti, ce que vous vous êtes dit, et vous cherchez une autre façon de voir.</p>
+
+      <p class="text-xs text-muted mt-3" style="line-height:1.5">Sources : HAS 2007/2025, INSERM 2015, Centre régional psychotrauma Grand Est, Outils Psy, Bénédicte Getenet (TCC).</p>
+    `
+  };
+  openModal(type === 'emdr' ? 'L\'EMDR' : 'Les TCC', contenus[type]);
+}
+
+function ouvrirPensees(){
+  const entrees = state.pensees || [];
+  const corps = entrees.length === 0
+    ? '<div class="empty"><div class="em-ic">○</div><div class="em-t">Aucune pensée notée</div><div class="em-s">Commencez par en noter une.</div></div>'
+    : entrees.slice().reverse().map(e => `
+      <div class="pat-beck-item">
+        <div class="pb-d">${formatDate(e.date)} · pensée intensité ${e.intensite}/10</div>
+        <div style="font-size:13px;line-height:1.5;margin-bottom:6px">« ${escapeHtml(e.pensee)} »</div>
+        ${e.alternative ? `<div style="font-size:12px;color:var(--sage);line-height:1.5;padding-left:8px;border-left:2px solid var(--sage)">→ ${escapeHtml(e.alternative)}</div>` : ''}
+      </div>
+    `).join('');
+
+  openModal('Mes pensées', `
+    <p class="text-sm text-muted mb-2">Quand une pensée tourne en boucle, écrivez-la. Puis essayez d'en formuler une autre version — pas plus "vraie", juste plus douce, plus aérée.</p>
+    <button class="btn btn-primary btn-sm mb-2" onclick="ouvrirEcrirePensee()">+ Noter une pensée</button>
+    ${corps}
+  `);
+}
+
+function ouvrirEcrirePensee(){
+  openModal('Noter une pensée', `
+    <div class="cmi-form">
+      <div class="field"><label>La pensée qui revient</label><textarea id="pn-p" rows="3" placeholder="« Je suis... », « Je vais... », « Personne ne... »"></textarea></div>
+      <div class="field"><label>Intensité (1 à 10)</label>
+        <div class="slider-row"><input type="range" id="pn-i" min="1" max="10" value="6" oninput="document.getElementById('pn-iv').textContent=this.value"><span class="sr-val" id="pn-iv">6</span></div>
+      </div>
+      <div class="field"><label>Une autre façon de voir (facultatif)</label><textarea id="pn-a" rows="3" placeholder="Que dirait quelqu'un qui m'aime ? Quels faits soutiennent une autre lecture ?"></textarea></div>
+    </div>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">Annuler</button><button class="btn btn-primary" onclick="sauverPensee()">Enregistrer</button>`);
+}
+
+function sauverPensee(){
+  const p = document.getElementById('pn-p').value.trim();
+  if(!p){ toast('Pensée vide'); return; }
+  if(!state.pensees) state.pensees = [];
+  state.pensees.push({
+    date:new Date().toISOString().slice(0,10),
+    pensee:p,
+    intensite:parseInt(document.getElementById('pn-i').value),
+    alternative:document.getElementById('pn-a').value
+  });
+  saveState();
+  closeModal();
+  toast('Pensée enregistrée');
+  renderPatiente('outils');
+}
+
+function ouvrirAncrage(){
+  document.getElementById('app').innerHTML = `
+    <div class="pat-app">
+      <div class="pat-head">
+        <div style="display:flex;align-items:center;gap:12px"><button class="btn btn-ghost btn-sm" onclick="go('/u/outils')">← Retour</button></div>
+        <div class="greet" style="margin-top:8px">Ancrage 5-4-3-2-1</div>
+        <div class="greet-sub">Prenez votre temps. Aucune obligation.</div>
+      </div>
+      <div class="pat-body">
+        <div class="ancrage-step">
+          <div class="as-num">5</div>
+          <div class="as-lbl">choses que je vois</div>
+          <div class="as-sub">Regardez autour de vous. Nommez ce que vos yeux voient.</div>
+          ${[1,2,3,4,5].map(i => `<input type="text" placeholder="Je vois...">`).join('')}
+        </div>
+        <div class="ancrage-step">
+          <div class="as-num">4</div>
+          <div class="as-lbl">choses que je touche</div>
+          <div class="as-sub">Posez vos mains sur ce qui vous entoure. Sentez la texture, la température.</div>
+          ${[1,2,3,4].map(i => `<input type="text" placeholder="Je touche...">`).join('')}
+        </div>
+        <div class="ancrage-step">
+          <div class="as-num">3</div>
+          <div class="as-lbl">choses que j'entends</div>
+          <div class="as-sub">Tendez l'oreille. Loin, près. Tous les sons sont permis.</div>
+          ${[1,2,3].map(i => `<input type="text" placeholder="J'entends...">`).join('')}
+        </div>
+        <div class="ancrage-step">
+          <div class="as-num">2</div>
+          <div class="as-lbl">choses que je sens</div>
+          <div class="as-sub">Une odeur, un parfum, un goût en bouche.</div>
+          ${[1,2].map(i => `<input type="text" placeholder="Je sens...">`).join('')}
+        </div>
+        <div class="ancrage-step">
+          <div class="as-num">1</div>
+          <div class="as-lbl">chose que je goûte</div>
+          <div class="as-sub">Le goût en bouche, un verre d'eau, ce que vous voulez.</div>
+          <input type="text" placeholder="Je goûte...">
+        </div>
+        <div style="text-align:center;padding:20px 0">
+          <button class="btn btn-primary" onclick="terminerAncrage()">Je me sens mieux ✓</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function terminerAncrage(){
+  state.exercices.push({ type:'ancrage', date: new Date().toISOString() });
+  saveState();
+  toast('Bravo. Vous venez de prendre soin de vous.');
+  setTimeout(()=>go('/u/outils'), 1200);
+}
+
+let _breathTimer = null, _breathCycle = 0, _breathPhase = 'in';
+function ouvrirRespiration(){
+  _breathCycle = 0; _breathPhase = 'in';
+  document.getElementById('app').innerHTML = `
+    <div class="pat-app">
+      <div class="pat-head">
+        <button class="btn btn-ghost btn-sm" onclick="stopRespi();go('/u/outils')">← Retour</button>
+        <div class="greet" style="margin-top:8px">Cohérence cardiaque</div>
+        <div class="greet-sub">5 secondes d'inspiration · 5 secondes d'expiration · 5 minutes</div>
+      </div>
+      <div class="pat-body">
+        <div class="breath-wrap">
+          <div class="breath-circle" id="breath-circle">Inspirez</div>
+          <div class="breath-info">
+            <div class="timer" id="breath-timer">5:00</div>
+            <div class="cycle" id="breath-cycle">cycle 0 / 30</div>
+          </div>
+          <div style="margin-top:24px;display:flex;gap:8px">
+            <button class="btn btn-primary" id="breath-start" onclick="startRespi()">Commencer</button>
+            <button class="btn btn-secondary" onclick="stopRespi();go('/u/outils')">Arrêter</button>
+          </div>
+          <p class="text-xs text-muted mt-3" style="text-align:center;max-width:280px">Inspirez quand le cercle s'agrandit. Expirez quand il rétrécit. Suivez votre rythme.</p>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function startRespi(){
+  document.getElementById('breath-start').disabled = true;
+  const circle = document.getElementById('breath-circle');
+  let remaining = 300; // 5 min
+  _breathTimer = setInterval(()=>{
+    // alternance toutes les 5s
+    if(remaining % 10 === 0){
+      circle.classList.add('in');
+      circle.textContent = 'Inspirez';
+      _breathCycle++;
+    } else if(remaining % 10 === 5){
+      circle.classList.remove('in');
+      circle.textContent = 'Expirez';
+    }
+    document.getElementById('breath-timer').textContent = `${Math.floor(remaining/60)}:${String(remaining%60).padStart(2,'0')}`;
+    document.getElementById('breath-cycle').textContent = `cycle ${_breathCycle} / 30`;
+    remaining--;
+    if(remaining < 0){
+      stopRespi();
+      state.exercices.push({ type:'respiration', date: new Date().toISOString() });
+      saveState();
+      toast('Séance terminée. Bravo.');
+      go('/u/outils');
+    }
+  }, 1000);
+  // déclencher le premier cycle
+  circle.classList.add('in');
+  circle.textContent = 'Inspirez';
+}
+
+function stopRespi(){
+  if(_breathTimer){ clearInterval(_breathTimer); _breathTimer = null; }
+}
+
+function patSecuriteHTML(){
+  const ps = state.plan_securite || {};
+  const champs = [
+    ['signaux','Signaux qui m\'alertent','Ce que je remarque chez moi ou chez mon partenaire avant une crise.'],
+    ['strategies','Comment je me protège','Là où je vais, ce que je fais, comment je sors d\'une situation.'],
+    ['contacts_surs','Personnes sur qui je peux compter','Numéros, prénoms, qui je peux appeler.'],
+    ['lieux_surs','Endroits où je suis en sécurité','Adresses, accès, qui m\'y attend.'],
+    ['objets','Mon sac de départ','Ce que je dois pouvoir emporter rapidement.'],
+    ['professionnels','Mes professionnels','3919, médecin, avocate, association.'],
+    ['code','Mon mot-signal','Un mot ou une phrase que mes proches reconnaîtront.'],
+    ['depart','Si je dois partir','Ce qui est déjà préparé.']
+  ];
+  return `
+    <h3 class="serif" style="font-size:20px;font-weight:600;margin-bottom:6px">Mon plan</h3>
+    <p class="text-sm text-muted mb-2">Tout ce qui est ici reste sur votre appareil. Vous pouvez le compléter à votre rythme.</p>
+
+    ${champs.map(([k,l,h]) => `
+      <div class="plan-section">
+        <h4>${l}</h4>
+        <div class="ph">${h}</div>
+        <textarea oninput="majPlanPerso('${k}',this.value)" placeholder="Écrire ici…">${ps[k]||''}</textarea>
+      </div>
+    `).join('')}
+  `;
+}
+
+function majPlanPerso(k, v){
+  if(!state.plan_securite) state.plan_securite = {};
+  state.plan_securite[k] = v;
+  saveState();
+}
+
+function patUrgenceHTML(){
+  const numeros = [
+    { num:'17', name:'Police-Secours', desc:'Danger immédiat. Appel gratuit, 24h/24.', alert:true },
+    { num:'3919', name:'Violences Femmes Info', desc:'Écoute, information, orientation. Anonyme, gratuit. 24h/24, 7j/7.', alert:false },
+    { num:'114', name:'Numéro d\'urgence par SMS', desc:'Si je ne peux pas parler. Pour personnes sourdes/malentendantes ou en danger silencieux.', alert:false },
+    { num:'3114', name:'Prévention du suicide', desc:'Si j\'ai des pensées de mourir. Confidentiel, gratuit, 24h/24.', alert:false },
+    { num:'119', name:'Allô Enfance en Danger', desc:'Pour signaler un enfant en danger.', alert:false },
+    { num:'3018', name:'Cyberviolences', desc:'Cyberharcèlement, revenge porn, contenus diffusés sans accord.', alert:false }
+  ];
+  return `
+    <h3 class="serif" style="font-size:20px;font-weight:600;margin-bottom:6px">Numéros utiles</h3>
+    <p class="text-sm text-muted mb-2">Tous gratuits depuis un téléphone fixe ou portable.</p>
+
+    ${numeros.map(n => `
+      <a href="tel:${n.num}" class="urg-card ${n.alert?'alert':''}" style="text-decoration:none">
+        <div class="uc-num">${n.num}</div>
+        <div class="uc-info">
+          <div class="uc-name">${n.name}</div>
+          <div class="uc-desc">${n.desc}</div>
+        </div>
+      </a>
+    `).join('')}
+
+    <div class="pat-card mt-2">
+      <h3>Sites de référence</h3>
+      <div class="pc-sub">
+        <div>arretonslesviolences.gouv.fr</div>
+        <div>solidaritefemmes.org</div>
+        <div>memoiretraumatique.org</div>
+      </div>
+    </div>
+  `;
+}
+
+/* ============================================================
+   Utilitaires
+   ============================================================ */
+
+function formatDate(d){
+  if(!d) return '—';
+  const x = new Date(d);
+  return x.toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric' });
+}
+function formatDateShort(d){
+  return new Date(d).toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit' });
+}
+function formatDateLong(d){
+  if(!d) return '___';
+  return new Date(d).toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' });
+}
+function formatDateRelative(d){
+  const today = new Date().toISOString().slice(0,10);
+  if(d === today) return 'aujourd\'hui';
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0,10);
+  if(d === yesterday) return 'hier';
+  return 'le ' + formatDate(d);
+}
+function escapeHtml(s){
+  return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ============================================================
+   Démarrage
+   ============================================================ */
+
+seedDemo();
+route();
+</script>
+</body>
+</html>
