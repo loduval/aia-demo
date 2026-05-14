@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AÏA — L'appui clinique</title>
+<title>AÏA v0.4 — L'appui clinique</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -507,7 +507,7 @@ a{color:inherit;text-decoration:none}
    AÏA — État, persistance, routage
    ============================================================ */
 
-const STORE_KEY = 'aia_v0_3';
+const STORE_KEY = 'aia_v0_4';
 
 const DEFAULT_STATE = {
   patientes: [],
@@ -1444,14 +1444,14 @@ function renderCharts(p){
    ============================================================ */
 
 const EMDR_PHASES = [
-  ['Histoire', 'Anamnèse, plan de ciblage'],
-  ['Préparation', 'Lieu sûr, ressources, signal STOP'],
-  ['Évaluation', 'Image, CN, CP, VOC, SUD, sensation'],
-  ['Désensibilisation', 'SBA, retraitement (SUD→0)'],
-  ['Installation', 'Renforcement CP (VOC→7)'],
-  ['Scanner corporel', 'Vérification sensations'],
-  ['Clôture', 'Retour à un état stable'],
-  ['Réévaluation', 'Contrôle gains entre séances']
+  { num:1, nom:'Histoire', sub:'Anamnèse, plan de ciblage', obj:'Recueillir l\'histoire trauma, identifier les cibles passé/présent/futur (modèle 3 prongs), évaluer la stabilité psychique, repérer les contre-indications.', criteres:'Touchstone identifié OU plan de ciblage construit. Patient suffisamment stable.' },
+  { num:2, nom:'Préparation', sub:'Lieu sûr, ressources, signal STOP', obj:'Établir l\'alliance, psychoéduquer sur le modèle TAI, installer le lieu sûr (Leeds 1998), développer les ressources internes, mettre en place le signal STOP et la métaphore du train.', criteres:'Patient stabilisé, lieu sûr fonctionnel (testé SBA lente), 1 à 3 ressources installées, fenêtre de tolérance accessible (Siegel).' },
+  { num:3, nom:'Évaluation', sub:'Image, CN, CP, VOC, SUD, sensation', obj:'Activer la cible. Recueillir les 7 éléments standardisés : image du pire moment, CN auto-référencée, CP positive plausible, VOC initial 1-7, émotion dominante, SUD initial 0-10, localisation corporelle.', criteres:'7 éléments standardisés recueillis. CN auto-référencée. CP non négationniste.' },
+  { num:4, nom:'Désensibilisation', sub:'SBA, retraitement (SUD→0)', obj:'SBA en séries de 24-40 a/r. « Que remarquez-vous ? » entre séries. Suivre les canaux associatifs spontanés. Reprendre SUD régulièrement. Gérer les blocages par entrelacement cognitif.', criteres:'SUD ≤ 1 (idéalement 0) et écologique.' },
+  { num:5, nom:'Installation', sub:'Renforcement CP (VOC→7)', obj:'Ajuster la CP si une plus authentique a émergé. Reprendre VOC. SBA en séries courtes (8-12 a/r, modalité lente). Poursuivre jusqu\'à VOC = 7.', criteres:'VOC = 7 ou plafond écologique.' },
+  { num:6, nom:'Scanner corporel', sub:'Vérification sensations', obj:'Cible + CP en tête, scanner corps de la tête aux pieds. Toute sensation négative ou inhabituelle est retraitée par SBA jusqu\'à neutralité. Sensations positives → SBA pour renforcement.', criteres:'Pas de sensation négative résiduelle.' },
+  { num:7, nom:'Clôture', sub:'Retour à un état stable', obj:'Ramener le patient dans sa fenêtre de tolérance, quel que soit l\'état de la cible. Lieu sûr, conteneur. Psychoéducation suivi inter-séances. Si séance incomplète : conteneur explicite.', criteres:'Patient stable, ressources accessibles.' },
+  { num:8, nom:'Réévaluation', sub:'Contrôle gains entre séances', obj:'Début de la séance suivante. Reprendre la cible : SUD ? VOC ? Apparition de nouveaux canaux ? Décider de la suite (poursuivre cible, prochaine cible, autre travail).', criteres:'Décision claire de plan pour la séance.' }
 ];
 
 const EMDR_CN_CATALOG = {
@@ -1469,6 +1469,11 @@ const EMDR_CN_CATALOG = {
     label:'Choix / contrôle',
     cn:['Je n\'ai pas de choix.','Je suis impuissante.','Je suis piégée.','Je ne contrôle rien.','Je suis sans recours.'],
     cp:['J\'ai des choix maintenant.','Je peux décider.','Je suis libre.','J\'ai du pouvoir sur ma vie.']
+  },
+  'honte':{
+    label:'Honte (Parnell)',
+    cn:['Je suis sale.','Je suis honteuse.','Je suis brisée.','Je suis répugnante.','Je suis souillée.'],
+    cp:['Je suis digne.','Je suis entière.','Je suis aimable.','J\'ai de la valeur.','Je suis propre.']
   }
 };
 
@@ -1479,9 +1484,9 @@ function emdrHTML(p){
   const phasesHTML = EMDR_PHASES.map((ph,i) => {
     const num = i+1;
     const cls = num < e.phase_actuelle ? 'done' : num === e.phase_actuelle ? 'current' : '';
-    return `<div class="emdr-phase ${cls}" onclick="majPhaseEMDR('${p.id}',${num})">
+    return `<div class="emdr-phase ${cls}" onclick="ouvrirDetailPhase('${p.id}',${num})" title="Cliquer pour script détaillé">
       <div class="ep-num">${num}</div>
-      <div class="ep-lbl">${ph[0]}<br><span style="font-size:10px;opacity:.7">${ph[1]}</span></div>
+      <div class="ep-lbl">${ph.nom}<br><span style="font-size:10px;opacity:.7">${ph.sub}</span></div>
     </div>`;
   }).join('');
 
@@ -1536,9 +1541,17 @@ function emdrHTML(p){
 
   return `
     <div class="section">
-      <div class="section-head"><h3>Phases du protocole EMDR</h3><div class="meta">Cliquez pour mettre à jour la phase en cours</div></div>
+      <div class="section-head">
+        <h3>Phases du protocole EMDR <span style="font-family:'Inter';font-size:11px;color:var(--ink-3);font-weight:400;margin-left:6px">Shapiro 2018 · TAI</span></h3>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn btn-secondary btn-sm" onclick="ouvrirGuideEMDR()">📖 Guide praticien</button>
+          <div class="meta">Cliquer une phase = script détaillé</div>
+        </div>
+      </div>
       <div class="emdr-phases">${phasesHTML}</div>
-      <p class="text-sm text-muted">Phase actuelle : <strong>Phase ${e.phase_actuelle} — ${EMDR_PHASES[e.phase_actuelle-1][0]}</strong>. ${EMDR_PHASES[e.phase_actuelle-1][1]}.</p>
+      <p class="text-sm text-muted">Phase actuelle : <strong>Phase ${e.phase_actuelle} — ${EMDR_PHASES[e.phase_actuelle-1].nom}</strong>. ${EMDR_PHASES[e.phase_actuelle-1].sub}.
+        <button class="btn btn-ghost btn-sm" style="margin-left:8px" onclick="changerPhaseActuelle('${p.id}')">Modifier la phase courante</button>
+      </p>
     </div>
 
     <div class="row">
@@ -1572,8 +1585,177 @@ function majPhaseEMDR(patId, phase){
   if(!p.emdr) p.emdr = { phase_actuelle:1, lieu_sur:'', ressources:[], cibles:[] };
   p.emdr.phase_actuelle = phase;
   saveState();
-  toast('Phase '+phase+' — '+EMDR_PHASES[phase-1][0]);
+  toast('Phase '+phase+' — '+EMDR_PHASES[phase-1].nom);
   go('/p/'+patId+'/emdr');
+}
+
+function changerPhaseActuelle(patId){
+  const p = state.patientes.find(x => x.id === patId);
+  const courante = (p.emdr && p.emdr.phase_actuelle) || 1;
+  const opts = EMDR_PHASES.map(ph => `<option value="${ph.num}" ${ph.num===courante?'selected':''}>Phase ${ph.num} — ${ph.nom}</option>`).join('');
+  openModal('Phase courante du protocole', `
+    <p class="text-sm text-muted mb-2">Indique où en est le retraitement avec cette patiente.</p>
+    <select id="cp-sel" class="select" style="width:100%">${opts}</select>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
+      <button class="btn btn-primary" onclick="majPhaseEMDR('${patId}',parseInt(document.getElementById('cp-sel').value));closeModal()">Valider</button>`);
+}
+
+function ouvrirDetailPhase(patId, num){
+  const ph = EMDR_PHASES[num-1];
+  const isCurrent = (state.patientes.find(x=>x.id===patId).emdr||{}).phase_actuelle === num;
+  openModal(`Phase ${num} — ${ph.nom}`, `
+    <p class="text-sm text-muted mb-2" style="background:var(--paper-2);padding:10px;border-radius:6px;border-left:3px solid var(--clinic)">
+      <strong>${ph.sub}</strong>
+    </p>
+    <div style="margin-top:14px">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);font-weight:600;margin-bottom:6px">Objectif clinique</div>
+      <p style="font-size:14px;line-height:1.65">${ph.obj}</p>
+    </div>
+    <div style="margin-top:14px">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);font-weight:600;margin-bottom:6px">Critère de passage</div>
+      <p style="font-size:14px;line-height:1.65;color:var(--ink-2)">${ph.criteres}</p>
+    </div>
+    ${num===3 ? `<div style="margin-top:14px;padding:12px;background:var(--paper-2);border-radius:8px;font-size:13px;line-height:1.7">
+      <strong>Script Shapiro — Phase 3 (verbatim) :</strong><br>
+      « Quand vous pensez à cet événement, quelle est l'image qui représente le pire moment ? »<br>
+      « Quels sont les mots qui vont avec cette image et qui expriment votre croyance négative sur vous-même maintenant ? »<br>
+      « Quand vous pensez à cette image, qu'aimeriez-vous croire de vous-même maintenant ? »<br>
+      « À quel point ces mots [CP] sonnent vrais maintenant, sur une échelle de 1 à 7 ? » (VOC)<br>
+      « Quand vous pensez à cette image et aux mots [CN], quelle émotion ressentez-vous ? »<br>
+      « De 0 à 10, à quel point cette image vous perturbe maintenant ? » (SUD)<br>
+      « Où ressentez-vous cela dans votre corps ? »
+    </div>` : ''}
+    ${num===4 ? `<div style="margin-top:14px;padding:12px;background:var(--paper-2);border-radius:8px;font-size:13px;line-height:1.7">
+      <strong>Conduite de la désensibilisation :</strong><br>
+      « Concentrez-vous sur l'image, les mots [CN], et la sensation [corporelle]. Suivez mes doigts. »<br>
+      SBA en séries de 24-40 a/r (oculaire) ou modalité équivalente.<br>
+      Entre chaque série : <em>« Que remarquez-vous maintenant ? »</em><br>
+      Reprendre SUD régulièrement (toutes les 2-3 séries ou changement notable).<br>
+      Si looping → entrelacement cognitif (voir Guide praticien).
+    </div>` : ''}
+    ${num===5 ? `<div style="margin-top:14px;padding:12px;background:var(--paper-2);border-radius:8px;font-size:13px;line-height:1.7">
+      <strong>Installation — script :</strong><br>
+      « Quand vous pensez à l'événement original, les mots [CP] sonnent-ils encore vrais ? Y a-t-il d'autres mots qui sonneraient plus juste maintenant ? »<br>
+      Ajuster la CP si une nouvelle est plus authentique.<br>
+      SBA en séries courtes (8-12 a/r, modalité lente). Poursuivre jusqu'à VOC = 7.
+    </div>` : ''}
+    ${num===6 ? `<div style="margin-top:14px;padding:12px;background:var(--paper-2);border-radius:8px;font-size:13px;line-height:1.7">
+      <strong>Scanner corporel — script :</strong><br>
+      « Gardez l'événement et les mots [CP] en tête. Faites un scan de votre corps de la tête aux pieds. Que remarquez-vous ? »<br>
+      Toute sensation négative → retraitement par SBA.<br>
+      Sensations positives → SBA pour renforcement.
+    </div>` : ''}
+    <div style="margin-top:18px;display:flex;gap:8px;flex-wrap:wrap">
+      ${!isCurrent ? `<button class="btn btn-primary btn-sm" onclick="majPhaseEMDR('${patId}',${num});closeModal()">Marquer comme phase courante</button>` : '<span class="meta">✓ Phase courante</span>'}
+      <button class="btn btn-ghost btn-sm" onclick="closeModal();ouvrirGuideEMDR()">📖 Voir le Guide praticien complet</button>
+    </div>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">Fermer</button>`);
+}
+
+function ouvrirGuideEMDR(){
+  const sections = [
+    {
+      titre:'1 · Modèle TAI (Traitement Adaptatif de l\'Information)',
+      contenu:`<p style="font-size:14px;line-height:1.7">L'EMDR repose sur le postulat d'un système naturel de traitement adaptatif de l'information (Shapiro 1995, 2018). Quand un événement traumatique dépasse les capacités d'intégration, l'information est stockée de manière dysfonctionnelle (souvenir « gelé », non lié au réseau adaptatif). La stimulation bilatérale alternée (SBA) réactive ce système naturel pour permettre la réintégration adaptative.</p>
+        <p style="font-size:14px;line-height:1.7;margin-top:8px">Le plan de ciblage suit le modèle des <strong>3 prongs (passé / présent / futur)</strong> : touchstone et cibles secondaires anciennes, déclencheurs actuels, patron d'action future (template) sous CP intégrée.</p>`
+    },
+    {
+      titre:'2 · Les 8 phases — repères opérationnels',
+      contenu:`<table style="width:100%;font-size:13px;border-collapse:collapse">
+        ${EMDR_PHASES.map(ph => `<tr style="border-bottom:1px solid var(--line)">
+          <td style="padding:8px 6px;font-weight:600;width:40px">${ph.num}</td>
+          <td style="padding:8px 6px"><strong>${ph.nom}</strong><br><span style="font-size:12px;color:var(--ink-3)">${ph.sub}</span></td>
+          <td style="padding:8px 6px;font-size:12px;color:var(--ink-2)">${ph.criteres}</td>
+        </tr>`).join('')}
+      </table>`
+    },
+    {
+      titre:'3 · Touchstone & techniques d\'accès',
+      contenu:`<p style="font-size:14px;line-height:1.7"><strong>Touchstone</strong> — événement le plus ancien associé à la CN actuelle. Cible princeps du protocole standard.</p>
+        <p style="font-size:14px;line-height:1.7;margin-top:8px"><strong>Float-back</strong> — depuis une situation actuelle activante, demander de remonter le fil émotionnel jusqu'au premier souvenir similaire.</p>
+        <p style="font-size:14px;line-height:1.7;margin-top:8px"><strong>Affect bridge</strong> (Watkins) — utiliser l'émotion / sensation actuelle comme pont vers l'origine.</p>`
+    },
+    {
+      titre:'4 · Entrelacement cognitif (Cognitive Interweave)',
+      contenu:`<p style="font-size:14px;line-height:1.7">Stratégie de Phase 4 pour débloquer un retraitement qui boucle (<em>looping</em>). Trois grands axes :</p>
+        <table style="width:100%;font-size:13px;border-collapse:collapse;margin-top:10px">
+          <tr style="border-bottom:1px solid var(--line)"><td style="padding:8px 6px;width:140px;font-weight:600">Responsabilité</td><td style="padding:8px 6px">« Qui était l'adulte / qui était l'enfant ? » · « Qui a fait quoi ? » · « De qui est la responsabilité ? »</td></tr>
+          <tr style="border-bottom:1px solid var(--line)"><td style="padding:8px 6px;font-weight:600">Sécurité</td><td style="padding:8px 6px">« Êtes-vous en danger maintenant ? » · « Quel âge avez-vous aujourd'hui ? » · « Où êtes-vous en ce moment ? »</td></tr>
+          <tr><td style="padding:8px 6px;font-weight:600">Choix / Pouvoir</td><td style="padding:8px 6px">« Que pourriez-vous faire aujourd'hui que vous ne pouviez pas faire alors ? » · « Quels choix avez-vous maintenant ? »</td></tr>
+        </table>
+        <p style="font-size:13px;line-height:1.6;margin-top:10px;color:var(--ink-2)"><strong>Règle d'or</strong> — question brève, réponse attendue, SBA immédiate sur la réponse. Ne pas développer une conversation autour de l'interweave.</p>`
+    },
+    {
+      titre:'5 · Domaines de cognitions (CN / CP) — 4 thèmes',
+      contenu:`<p style="font-size:13px;line-height:1.6;color:var(--ink-2)">Shapiro identifie 3 thèmes ; Parnell en ajoute un 4ᵉ (Honte) — particulièrement pertinent pour les violences sexuelles et conjugales.</p>
+        ${Object.entries(EMDR_CN_CATALOG).map(([k,v]) => `<details style="margin-top:8px;background:var(--paper-2);padding:10px 14px;border-radius:6px">
+          <summary style="cursor:pointer;font-weight:600;font-size:13px">${v.label}</summary>
+          <div style="margin-top:8px;font-size:13px;line-height:1.6">
+            <div><strong>CN :</strong> ${v.cn.map(x=>`« ${x} »`).join(' · ')}</div>
+            <div style="margin-top:4px"><strong>CP :</strong> ${v.cp.map(x=>`« ${x} »`).join(' · ')}</div>
+          </div>
+        </details>`).join('')}`
+    },
+    {
+      titre:'6 · Protocoles spécifiques',
+      contenu:`<table style="width:100%;font-size:13px;border-collapse:collapse">
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:8px 6px;font-weight:600;width:180px">Standard (Shapiro)</td><td style="padding:8px 6px">Trauma simple, événement identifié, phases 1-8 classiques.</td></tr>
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:8px 6px;font-weight:600">R-TEP (Solomon)</td><td style="padding:8px 6px">Événement récent (&lt; 3 mois), avant consolidation mnésique. Cible « épisode » plutôt que « moment ».</td></tr>
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:8px 6px;font-weight:600">Protocole inversé (Hofmann)</td><td style="padding:8px 6px">Patient flooded, instable, dissociatif : commencer par futur sécurisé / présent, finir par passé.</td></tr>
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:8px 6px;font-weight:600">Progressive (Gonzalez & Mosquera)</td><td style="padding:8px 6px">Trauma complexe, dissociation, attachement. Travail très progressif sur les parties dissociées (TDSP).</td></tr>
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:8px 6px;font-weight:600">Attachment-Focused (Parnell)</td><td style="padding:8px 6px">Trauma précoce, attachement insecure. Ressources d'attachement.</td></tr>
+        <tr><td style="padding:8px 6px;font-weight:600">DeTUR (Popky)</td><td style="padding:8px 6px">Addictions, urges. Cible le craving plutôt que le trauma.</td></tr>
+      </table>`
+    },
+    {
+      titre:'7 · Indications & contre-indications',
+      contenu:`<p style="font-size:14px;line-height:1.7"><strong>Indications (HAS, OMS, INSERM)</strong> : ESPT post-trauma simple, TSPT-Complexe (en phase-based), trouble panique, phobies, deuil compliqué, douleurs chroniques d'origine traumatique.</p>
+        <p style="font-size:14px;line-height:1.7;margin-top:8px"><strong>Contre-indications relatives</strong> (stabilisation préalable longue) :</p>
+        <ul style="padding-left:18px;font-size:13px;line-height:1.7">
+          <li>Trouble dissociatif sévère non stabilisé (DES-T &gt; 20 → orientation Progressive Gonzalez)</li>
+          <li>Trouble psychotique non stabilisé</li>
+          <li>Idéation suicidaire active</li>
+          <li>Pathologie cardiaque sévère non contrôlée</li>
+          <li>Crise de vie aiguë (sécurité physique non assurée — p. ex. patiente encore au domicile de l'agresseur)</li>
+          <li>Grossesse à risque (relatif)</li>
+          <li>Épilepsie photosensible → privilégier tactile/auditif</li>
+        </ul>
+        <p style="font-size:13px;line-height:1.6;margin-top:8px;color:var(--alert)"><strong>Violences conjugales</strong> — sécurité physique préalable IMPÉRATIVE avant tout retraitement. Stabilisation longue habituellement nécessaire (5 à 15 séances de phase 2).</p>`
+    },
+    {
+      titre:'8 · Bibliographie de référence',
+      contenu:`<p style="font-size:13px;line-height:1.6"><strong>Francophones :</strong></p>
+        <ul style="padding-left:18px;font-size:13px;line-height:1.7">
+          <li>Tarquinio C., Iracane-Coste M.-J. — <em>Pratique de la psychothérapie EMDR</em>, 2ᵉ éd. Dunod 2022.</li>
+          <li>Roques J. — <em>Découvrir l'EMDR</em>, InterEditions.</li>
+          <li>Desbiendras N. — Dossier Patient EMDR (modèles cliniques).</li>
+        </ul>
+        <p style="font-size:13px;line-height:1.6;margin-top:8px"><strong>Internationaux :</strong></p>
+        <ul style="padding-left:18px;font-size:13px;line-height:1.7">
+          <li>Shapiro F. — <em>EMDR: Basic Principles, Protocols, and Procedures</em>, 3ᵉ éd. Guilford 2018.</li>
+          <li>Leeds A. — <em>A Guide to the Standard EMDR Therapy Protocols</em>, 2ᵉ éd. Springer 2016.</li>
+          <li>Parnell L. — <em>Attachment-Focused EMDR</em>, Norton 2013.</li>
+          <li>Van der Hart, Nijenhuis, Steele — <em>The Haunted Self</em>, Norton 2006.</li>
+          <li>Gonzalez A. & Mosquera D. — <em>EMDR and Dissociation: The Progressive Approach</em>, 2012.</li>
+          <li>Van der Kolk B. — <em>The Body Keeps the Score</em>, Viking 2014.</li>
+          <li>Porges S. — <em>The Polyvagal Theory</em>, Norton 2011.</li>
+          <li>Siegel D. — <em>The Developing Mind</em>, 2ᵉ éd. Guilford 2012.</li>
+        </ul>
+        <p style="font-size:13px;line-height:1.6;margin-top:8px"><strong>Sociétés savantes :</strong> EMDR France (efpe.fr) · IFEMDR · EMDR Europe · EMDRIA · Trauma Aid France · ISTSS · Cn2r · HAS · INSERM 2015.</p>`
+    }
+  ];
+
+  openModal('📖 Guide praticien EMDR — Référentiel clinique', `
+    <p class="text-sm text-muted mb-2">Synthèse des fondements théoriques et procéduraux de la thérapie EMDR. Cliquer une section pour la déployer.</p>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      ${sections.map((s,i) => `
+        <details ${i===0?'open':''} style="background:var(--paper-2);border-radius:8px;padding:12px 14px">
+          <summary style="cursor:pointer;font-weight:600;font-size:14px;color:var(--ink)">${s.titre}</summary>
+          <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--line)">${s.contenu}</div>
+        </details>
+      `).join('')}
+    </div>
+  `, '<button class="btn btn-secondary" onclick="closeModal()">Fermer</button>');
 }
 
 function editerLieuSur(patId){
